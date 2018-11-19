@@ -2,6 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Dev200</Authors>
+    <Company>Dev200</Company>
+    <PackageLicenseUrl>https://github.com/marcodafonseca/Dynamo.ORM/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/marcodafonseca/Dynamo.ORM</PackageProjectUrl>
+    <Description>An async ORM built for Amazon Web Service's DynamoDb in .Net Standard</Description>
+    <RepositoryType>Git</RepositoryType>
+    <RepositoryUrl>https://github.com/marcodafonseca/Dynamo.ORM.git</RepositoryUrl>
+    <PackageTags>AWS DynamoDb, async DynamoDb, async AWS DynamoDb, AWS DynamoDb .Net Core</PackageTags>
+    <PackageReleaseNotes>This is still in alpha</PackageReleaseNotes>
+    <AssemblyVersion>0.0.1.0</AssemblyVersion>
+    <FileVersion>0.0.1.0</FileVersion>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageId>Dynamo.ORM</PackageId>
+    <Version>0.0.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
