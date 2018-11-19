@@ -36,6 +36,75 @@ namespace Dynamo.ORM.Converters
             return ConvertExpressionValues(expressionValues);
         }
 
+        private static Dictionary<string, AttributeValue> ConvertExpressionValues(IDictionary<string, object> expressionValues)
+        {
+            var convertedExpressionValues = new Dictionary<string, AttributeValue>();
+
+            foreach (var item in expressionValues)
+                convertedExpressionValues.Add(item.Key, AttributeValueConverter.ConvertToAttributeValue[item.Value.GetType()](item.Value));
+
+            return convertedExpressionValues;
+        }
+
+        private static IDictionary<string, object> GetExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
+        {
+            var variableName = $":val{valueIndex}";
+            IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
+
+            if (IsExpressionNodeType(binaryExpression.Left.NodeType))
+                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Left as BinaryExpression, ref valueIndex, ref expressionString));
+            else if (IsMemberNode(binaryExpression.Left as Expression))
+            {
+                var propertyName = GetPropertyReference(binaryExpression.Left);
+
+                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(binaryExpression.Right)));
+
+                expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
+                valueIndex++;
+            }
+
+            if (IsExpressionNodeType(binaryExpression.Right.NodeType))
+                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Right as BinaryExpression, ref valueIndex, ref expressionString));
+            else if (IsMemberNode(binaryExpression.Right as Expression))
+            {
+                var propertyName = GetPropertyReference(binaryExpression.Right);
+
+                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(binaryExpression.Left)));
+                expressionString.Replace(binaryExpression.ToString(), $"{variableName} {binaryExpression.NodeType} {propertyName}");
+                valueIndex++;
+            }
+
+            return expressionValues.ToDictionary(s => s.Key, s => s.Value);
+        }
+
+        private static string GetPropertyReference(Expression expression) => Base.GetPropertyReference(expression.ToString());
+
+        // Needs revising for a more generic approach
+        private static object GetValue(Expression expression)
+        {
+            if (Constants.ExpressionValues.GetExpressionValues.ContainsKey(expression.Type))
+                return Constants.ExpressionValues.GetExpressionValues[expression.Type](expression);
+            else
+                return Constants.ExpressionValues.GetExpressionValues[typeof(object)](expression);
+        }
+
+        private static bool IsMemberNode(Expression expression)
+        {
+            if (expression.NodeType != ExpressionType.MemberAccess)
+                return false;
+            if (expression is MemberExpression)
+                if (!(((MemberExpression)expression).Expression is ParameterExpression))
+                    return false;
+            return true;
+        }
+
+        private static bool IsExpressionNodeType(ExpressionType nodeType)
+        {
+            if (nodeType != ExpressionType.MemberAccess && nodeType != ExpressionType.Constant && nodeType != ExpressionType.New)
+                return true;
+            return false;
+        }
+
         private static void SanitizeExpression<T>(Expression<Func<T, bool>> expression, ref StringBuilder expressionString) where T : Base, new()
         {
             foreach (var parameter in expression.Parameters)
@@ -50,49 +119,5 @@ namespace Dynamo.ORM.Converters
             foreach (var comparitive in Constants.ExpressionValues.Comparitives)
                 expressionString.Replace(comparitive.Key, comparitive.Value);
         }
-
-        private static Dictionary<string, AttributeValue> ConvertExpressionValues(IDictionary<string, object> expressionValues)
-        {
-            var convertedExpressionValues = new Dictionary<string, AttributeValue>();
-
-            foreach (var item in expressionValues)
-                convertedExpressionValues.Add(item.Key, AttributeValueConverter.ConvertToAttributeValue[((ConstantExpression)item.Value).Type](item.Value));
-
-            return convertedExpressionValues;
-        }
-
-        private static IDictionary<string, object> GetExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
-        {
-            var variableName = $":val{valueIndex}";
-            IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
-
-            if (IsExpressionNodeType(binaryExpression.Left.NodeType))
-                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Left as BinaryExpression, ref valueIndex, ref expressionString));
-            else if (binaryExpression.Left.NodeType == ExpressionType.MemberAccess)
-            {
-                var propertyName = GetPropertyReference(binaryExpression.Left);
-
-                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, binaryExpression.Right));
-                expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
-                valueIndex++;
-            }
-
-            if (IsExpressionNodeType(binaryExpression.Right.NodeType))
-                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Right as BinaryExpression, ref valueIndex, ref expressionString));
-            else if (binaryExpression.Right.NodeType == ExpressionType.MemberAccess)
-            {
-                var propertyName = GetPropertyReference(binaryExpression.Right);
-
-                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, binaryExpression.Left));
-                expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
-                valueIndex++;
-            }
-
-            return expressionValues.ToDictionary(s => s.Key, s => s.Value);
-        }
-
-        private static string GetPropertyReference(Expression expression) => Base.GetPropertyReference(expression.ToString());
-
-        private static bool IsExpressionNodeType(ExpressionType nodeType) => nodeType != ExpressionType.MemberAccess && nodeType != ExpressionType.Constant;
     }
 }

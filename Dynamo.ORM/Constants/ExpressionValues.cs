@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Dynamo.ORM.Constants
@@ -10,12 +11,19 @@ namespace Dynamo.ORM.Constants
         {
             { "LessThanOrEqual", "<=" },
             { "GreaterThanOrEqual", ">=" },
-            { "AndAlso", "&&" },
+            { "AndAlso", "AND" },
             { "OrElse", "OR" },
             { "GreaterThan", ">" },
             { "NotEqual", "!=" },
             { "LessThan", "<" },
             { "Equal", "=" }
+        };
+
+        internal static readonly IDictionary<Type, Func<Expression, object>> GetExpressionValues = new Dictionary<Type, Func<Expression, object>>
+        {
+            { typeof(int), (expression) => Expression.Lambda<Func<int>>(expression).Compile()() },
+            { typeof(object), (expression) => Expression.Lambda<Func<object>>(expression).Compile()() },
+            { typeof(DateTime), (expression) => Expression.Lambda<Func<DateTime>>(expression).Compile()() }
         };
     }
 }

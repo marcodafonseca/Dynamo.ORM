@@ -82,11 +82,48 @@ namespace Dynamo.ORM.UnitTests.Extensions
             Assert.Equal("TEST", entity.Property1);
             Assert.True(entity.Property2);
         }
+
+        /// <summary>
+        /// Populates test data from an extension and then compares the returned key against the populated data
+        /// </summary>
+        [Fact]
+        public void TestGetKey_ExpectKeyDictionary()
+        {
+            var entity = new MockTable();
+
+            entity.PopulateProperties();
+
+            var keyDictionary = entity.GetKey();
+
+            Assert.True(keyDictionary.Count == 1);
+            Assert.Equal(entity.Id, int.Parse(keyDictionary["Id"].N));
+        }
+
+        /// <summary>
+        /// Populates test data from an extension and then compares the data against the returned dictionary
+        /// Makes sure that key properties aren't returned in the dictionary
+        /// </summary>
+        [Fact]
+        public void TestMappingToAttributeValueDictionary_ExpectKeyDictionaryWithSameValues()
+        {
+            var entity = new MockTable();
+
+            entity.PopulateProperties();
+
+            var valueDictionary = entity.Map();
+
+            Assert.True(valueDictionary.Count == 2);
+            Assert.Equal(entity.Property1, valueDictionary["Property1"].S);
+            Assert.Equal(entity.Property2, valueDictionary["Property2"].BOOL);
+            Assert.True(!valueDictionary.ContainsKey("Id"));
+        }
     }
 
     [DynamoDBTable("TestTableName")]
     public class MockTable : Base
     {
+        [DynamoDBHashKey]
+        public int Id { get; set; }
         public string Property1 { get; set; }
         public bool Property2 { get; set; }
 
@@ -97,5 +134,8 @@ namespace Dynamo.ORM.UnitTests.Extensions
     }
 
     public class MockNoNameTable : Base
-    { }
+    {
+        [DynamoDBHashKey]
+        public int Id { get; set; }
+    }
 }
