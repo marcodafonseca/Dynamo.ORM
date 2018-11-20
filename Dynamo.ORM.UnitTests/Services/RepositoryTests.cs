@@ -228,6 +228,27 @@ namespace Dynamo.ORM.UnitTests.Services
             for (int i = 0; i < results.Count; i++)
                 Assert.True(values[i].IsEqual(results[i]));
         }
+
+        /// <summary>
+        /// Test Repository's "Get" function using a boolean property
+        /// Expect item returned
+        /// </summary>
+        [Fact]
+        public async void TestBoolQuery_ExpectItemReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new MockTestTable();
+
+            value.PopulateProperties();
+
+            repository.Add(value);
+
+            var entity = await repository.Get<MockTestTable>(x => x.Property4 == true);
+
+            Assert.NotNull(entity);
+            Assert.True(entity.IsEqual(value));
+        }
     }
 
     [DynamoDBTable("TESTS")]
