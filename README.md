@@ -61,6 +61,8 @@ await repository.Delete<PersonModel>(1);
 
 ## Release Notes
 
+Click [here](ReleaseNotes.md) to view all the release notes
+
 ### Version 0.0.3.0
 
 * Changed Add, Update and Delete functions to be run asynchronously as Tasks
