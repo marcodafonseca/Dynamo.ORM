@@ -11,9 +11,9 @@ namespace Dynamo.ORM.Services
         Task<T> Get<T>(object partitionKey, object sortKey = null) where T : Base, new();
         Task<T> Get<T>(Expression<Func<T, bool>> expression) where T : Base, new();
         Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null) where T : Base, new();
-        void Add<T>(T entity) where T : Base, new();
-        void Update<T>(T entity) where T : Base, new();
-        void Delete<T>(object partitionKey, object sortKey = null) where T : Base, new();
-        void Delete<T>(T entity) where T : Base, new();
+        Task Add<T>(T entity) where T : Base, new();
+        Task Update<T>(T entity) where T : Base, new();
+        Task Delete<T>(object partitionKey, object sortKey = null) where T : Base, new();
+        Task Delete<T>(T entity) where T : Base, new();
     }
 }

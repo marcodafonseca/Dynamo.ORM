@@ -41,7 +41,12 @@ namespace Dynamo.ORM.Converters
             var convertedExpressionValues = new Dictionary<string, AttributeValue>();
 
             foreach (var item in expressionValues)
-                convertedExpressionValues.Add(item.Key, AttributeValueConverter.ConvertToAttributeValue[item.Value.GetType()](item.Value));
+            {
+                if (item.Value == null)
+                    convertedExpressionValues.Add(item.Key, new AttributeValue { NULL = true });
+                else
+                    convertedExpressionValues.Add(item.Key, AttributeValueConverter.ConvertToAttributeValue[item.Value.GetType()](item.Value));
+            }
 
             return convertedExpressionValues;
         }

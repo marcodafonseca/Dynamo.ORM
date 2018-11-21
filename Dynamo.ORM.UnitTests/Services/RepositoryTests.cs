@@ -46,7 +46,7 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity = await repository.Get<MockTestTable>(value.Id);
 
@@ -66,11 +66,11 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity1 = await repository.Get<MockTestTable>(value.Id);
 
-            repository.Delete(value);
+            await repository.Delete(value);
 
             var entity2 = await repository.Get<MockTestTable>(value.Id);
 
@@ -92,11 +92,11 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity1 = await repository.Get<MockTestTable>(value.Id);
 
-            repository.Delete<MockTestTable>(value.Id);
+            await repository.Delete<MockTestTable>(value.Id);
 
             var entity2 = await repository.Get<MockTestTable>(value.Id);
 
@@ -117,7 +117,7 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity = await repository.Get<MockTestTable>(x => x.Id == 100);
 
@@ -137,7 +137,7 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity = await repository.Get<MockTestTable>(x => x.Id == value.Id);
 
@@ -158,7 +158,7 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity1 = await repository.Get<MockTestTable>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100);
 
@@ -179,13 +179,13 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
             var entity1 = await repository.Get<MockTestTable>(value.Id);
 
             value.UpdateProperties();
 
-            repository.Update(value);
+            await repository.Update(value);
 
             var entity2 = await repository.Get<MockTestTable>(value.Id);
 
@@ -217,7 +217,7 @@ namespace Dynamo.ORM.UnitTests.Services
             }
 
             foreach (var value in values)
-                repository.Add(value);
+                await repository.Add(value);
 
             var results = (await repository.List<MockTestTable>(x => x.Id < 20 && x.Id >= 10))
                 .OrderBy(x => x.Id)
@@ -242,9 +242,9 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            repository.Add(value);
+            await repository.Add(value);
 
-            var entity = await repository.Get<MockTestTable>(x => x.Property4 == true);
+            var entity = await repository.Get<MockTestTable>(x => x.Property4 == true && x.Id == value.Id);
 
             Assert.NotNull(entity);
             Assert.True(entity.IsEqual(value));

@@ -14,7 +14,7 @@ namespace Dynamo.ORM.Constants
             { "AndAlso", "AND" },
             { "OrElse", "OR" },
             { "GreaterThan", ">" },
-            { "NotEqual", "!=" },
+            { "NotEqual", "<>" },
             { "LessThan", "<" },
             { "Equal", "=" }
         };

@@ -22,7 +22,7 @@ namespace Dynamo.ORM.Services
             this.amazonDynamoDB = amazonDynamoDB;
         }
 
-        public async void Add<T>(T entity) where T : Base, new()
+        public async Task Add<T>(T entity) where T : Base, new()
         {
             var request = new PutItemRequest
             {
@@ -33,7 +33,7 @@ namespace Dynamo.ORM.Services
             await amazonDynamoDB.PutItemAsync(request);
         }
 
-        public async void Delete<T>(T entity) where T : Base, new()
+        public async Task Delete<T>(T entity) where T : Base, new()
         {
             var request = new DeleteItemRequest
             {
@@ -44,7 +44,7 @@ namespace Dynamo.ORM.Services
             await amazonDynamoDB.DeleteItemAsync(request);
         }
         
-        public async void Delete<T>(object partitionKey, object sortKey = null) where T : Base, new()
+        public async Task Delete<T>(object partitionKey, object sortKey = null) where T : Base, new()
         {
             var generic = new T();
             var key = generic.GetKey(partitionKey, sortKey);
@@ -145,7 +145,7 @@ namespace Dynamo.ORM.Services
                 .ToList();
         }
 
-        public async void Update<T>(T entity) where T : Base, new()
+        public async Task Update<T>(T entity) where T : Base, new()
         {
             var request = new UpdateItemRequest
             {
