@@ -70,3 +70,7 @@ Click [here](ReleaseNotes.md) to view all the release notes
 * Updated repository tests
 * Updated NuGet packages
 * Added simple benchmarking application (Dynamo.ORM.Benchmarks)
+
+## Important Links
+* [Code Of Conduct](CODE_OF_CONDUCT.md)
+* [License](LICENSE)
