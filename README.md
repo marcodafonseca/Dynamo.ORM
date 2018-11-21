@@ -72,5 +72,6 @@ Click [here](ReleaseNotes.md) to view all the release notes
 * Added simple benchmarking application (Dynamo.ORM.Benchmarks)
 
 ## Important Links
+* [Contributing Guidlines](CONTRIBUTING.md)
 * [Code Of Conduct](CODE_OF_CONDUCT.md)
 * [License](LICENSE)
