@@ -1,3 +1,5 @@
+# Release Notes
+
 ### Version 0.0.3.0
 
 * Changed Add, Update and Delete functions to be run asynchronously as Tasks
