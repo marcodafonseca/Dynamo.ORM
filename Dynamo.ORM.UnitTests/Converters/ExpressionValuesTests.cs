@@ -91,8 +91,8 @@ namespace Dynamo.ORM.UnitTests.Converters
         }
 
         /// <summary>
-        //// Testing expression "(x) => x.Id <= 0"
-        //// Expecting string "#id <= :val0"
+        //// Testing expression "(x) => x.Id != 0"
+        //// Expecting string "#id <> :val0"
         /// </summary>
         [Fact]
         public void TestConvertExpressionValues_ExpectNotEqualExpressionString()
@@ -103,12 +103,12 @@ namespace Dynamo.ORM.UnitTests.Converters
 
             ExpressionValues.ConvertExpressionValues(expression, ref expressionString);
 
-            Assert.Equal("#id != :val0", expressionString.ToString());
+            Assert.Equal("#id <> :val0", expressionString.ToString());
         }
 
         /// <summary>
         //// Testing expression "(x) => x.Id != 0 && x.Id > -1 && x.Id < 1"
-        //// Expecting string "((#id != :val0 AND #id > :val1) AND #id < :val2)"
+        //// Expecting string "((#id <> :val0 AND #id > :val1) AND #id < :val2)"
         /// </summary>
         [Fact]
         public void TestConvertExpressionValues_ExpectComplexAndExpressionString()
@@ -119,12 +119,12 @@ namespace Dynamo.ORM.UnitTests.Converters
 
             ExpressionValues.ConvertExpressionValues(expression, ref expressionString);
 
-            Assert.Equal("((#id != :val0 AND #id > :val1) AND #id < :val2)", expressionString.ToString());
+            Assert.Equal("((#id <> :val0 AND #id > :val1) AND #id < :val2)", expressionString.ToString());
         }
 
         /// <summary>
         //// Testing expression "(x) => x.Id != 0 || x.Id > -1 || x.Id < 1"
-        //// Expecting string "((#id != :val0 OR #id > :val1) OR #id < :val2)"
+        //// Expecting string "((#id <> :val0 OR #id > :val1) OR #id < :val2)"
         /// </summary>
         [Fact]
         public void TestConvertExpressionValues_ExpectComplexOrExpressionString()
@@ -135,12 +135,12 @@ namespace Dynamo.ORM.UnitTests.Converters
 
             ExpressionValues.ConvertExpressionValues(expression, ref expressionString);
 
-            Assert.Equal("((#id != :val0 OR #id > :val1) OR #id < :val2)", expressionString.ToString());
+            Assert.Equal("((#id <> :val0 OR #id > :val1) OR #id < :val2)", expressionString.ToString());
         }
 
         /// <summary>
         //// Testing expression "(x.Id != 0 && x.Id > -1) || x.Id < 1"
-        //// Expecting string "((#id != :val0 AND #id > :val1) OR #id < :val2)"
+        //// Expecting string "((#id <> :val0 AND #id > :val1) OR #id < :val2)"
         /// </summary>
         [Fact]
         public void TestConvertExpressionValues_ExpectComplexAndOrExpressionString()
@@ -151,7 +151,7 @@ namespace Dynamo.ORM.UnitTests.Converters
 
             ExpressionValues.ConvertExpressionValues(expression, ref expressionString);
 
-            Assert.Equal("((#id != :val0 AND #id > :val1) OR #id < :val2)", expressionString.ToString());
+            Assert.Equal("((#id <> :val0 AND #id > :val1) OR #id < :val2)", expressionString.ToString());
         }
     }
 

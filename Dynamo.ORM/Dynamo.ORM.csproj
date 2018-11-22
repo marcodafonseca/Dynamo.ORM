@@ -9,23 +9,43 @@
     <Description>An async ORM built for Amazon Web Service's DynamoDb in .Net Standard</Description>
     <RepositoryType>Git</RepositoryType>
     <RepositoryUrl>https://github.com/marcodafonseca/Dynamo.ORM.git</RepositoryUrl>
-    <PackageTags>AWS DynamoDb, async DynamoDb, async AWS DynamoDb, AWS DynamoDb .Net Core</PackageTags>
+    <PackageTags>async AWS DynamoDb ORM .Net-Core .Net-Standard</PackageTags>
     <PackageReleaseNotes>This is still in alpha
 
 -- Release Notes --
+Added support for more data types
+- byte
+- byte?
+- byte[]
+- char
+- char?
+- decimal
+- decimal?
+- double
+- double?
+- float
+- float?
+- Int16 (short)
+- Int16? (short?)
+- Int64 (long)
+- Int64? (long?)
+- UInt16 (ushort)
+- UInt16? (ushort?)
+- UInt32 (uint)
+- UInt32? (uint?)
+- UInt64 (ulong)
+- UInt64? (ulong?)
+Increased support for nullable types
 
-v.0.0.3.0
-
-Changed Add, Update and Delete functions to be run asynchronously as Tasks
-Added "null" support for expressions
-Updated repository tests
-Updated NuGet packages
-Added simple benchmarking application (Dynamo.ORM.Benchmarks)</PackageReleaseNotes>
-    <AssemblyVersion>0.0.3.0</AssemblyVersion>
-    <FileVersion>0.0.3.0</FileVersion>
+Full history of release notes can be found on the GitHub page</PackageReleaseNotes>
+    <AssemblyVersion>0.0.4.0</AssemblyVersion>
+    <FileVersion>0.0.4.0</FileVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>Dynamo.ORM</PackageId>
-    <Version>0.0.3.0</Version>
+    <Version>0.0.4.0</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Copyright>Dev200 Pty. LTD</Copyright>
+    <PackageIconUrl>https://dev200.co.za/images/logo.png</PackageIconUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -249,12 +249,34 @@ namespace Dynamo.ORM.UnitTests.Services
             Assert.NotNull(entity);
             Assert.True(entity.IsEqual(value));
         }
+
+        /// <summary>
+        /// Test filtering by a nullable field
+        /// </summary>
+        [Fact]
+        public async void TestQueryOnNullValue_ExpectItemReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new MockTestTable();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entity = await repository.List<MockTestTable>(x => x.Property6 == null);
+
+            var size = entity.Count;
+
+            Assert.NotEqual(0, size);
+        }
     }
 
     [DynamoDBTable("TESTS")]
     class MockTestTable : Base
     {
         private DateTime property2;
+        private DateTime? property11;
 
         [DynamoDBHashKey]
         public int Id { get; set; }
@@ -272,5 +294,38 @@ namespace Dynamo.ORM.UnitTests.Services
         }
         public int Property3 { get; set; }
         public bool Property4 { get; set; }
+        public byte Property5 { get; set; }
+        public byte? Property6 { get; set; }
+        public byte[] Property7 { get; set; }
+        public bool? Property8 { get; set; }
+        public char Property9 { get; set; }
+        public char? Property10 { get; set; }
+        public DateTime? Property11
+        {
+            get
+            {
+                return property11?.ToUniversalTime();
+            }
+            set
+            {
+                property11 = value;
+            }
+        }
+        public decimal Property12 { get; set; }
+        public decimal? Property13 { get; set; }
+        public double Property14 { get; set; }
+        public double? Property15 { get; set; }
+        public float Property16 { get; set; }
+        public float? Property17 { get; set; }
+        public short Property18 { get; set; }
+        public short? Property19 { get; set; }
+        public long Property20 { get; set; }
+        public long? Property21 { get; set; }
+        public ushort Property22 { get; set; }
+        public ushort? Property23 { get; set; }
+        public ulong Property24 { get; set; }
+        public ulong? Property25 { get; set; }
+        public uint Property26 { get; set; }
+        public uint? Property27 { get; set; }
     }
 }
