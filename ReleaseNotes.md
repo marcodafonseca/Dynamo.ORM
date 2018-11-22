@@ -2,27 +2,27 @@
 
 ### Version 0.0.4.0
 * Added support for more data types
-* * byte
-* * byte?
-* * byte[]
-* * char
-* * char?
-* * decimal
-* * decimal?
-* * double
-* * double?
-* * float
-* * float?
-* * Int16 (short)
-* * Int16? (short?)
-* * Int64 (long)
-* * Int64? (long?)
-* * UInt16 (ushort)
-* * UInt16? (ushort?)
-* * UInt32 (uint)
-* * UInt32? (uint?)
-* * UInt64 (ulong)
-* * UInt64? (ulong?)
+  * byte
+  * byte?
+  * byte[]
+  * char
+  * char?
+  * decimal
+  * decimal?
+  * double
+  * double?
+  * float
+  * float?
+  * Int16 (short)
+  * Int16? (short?)
+  * Int64 (long)
+  * Int64? (long?)
+  * UInt16 (ushort)
+  * UInt16? (ushort?)
+  * UInt32 (uint)
+  * UInt32? (uint?)
+  * UInt64 (ulong)
+  * UInt64? (ulong?)
 * Increased support for nullable types
 
 ### Version 0.0.3.0
