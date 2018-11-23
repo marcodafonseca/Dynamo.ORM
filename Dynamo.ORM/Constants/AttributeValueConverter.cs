@@ -22,12 +22,12 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
-            { typeof(byte), (object @object) => new AttributeValue { B = new MemoryStream(new byte[] { (byte)@object }) } },
+            { typeof(byte), (object @object) => new AttributeValue { N = $"{@object}" } },
             { typeof(byte?), (object @object) =>
                 {
                     var attributeValue = new AttributeValue();
                     if (@object != null)
-                        attributeValue.B = new MemoryStream(new byte[] { (byte)@object });
+                        attributeValue.N = $"{@object}";
                     else
                         attributeValue.NULL = true;
                     return attributeValue;
@@ -43,12 +43,12 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
-            { typeof(char), (object @object) => new AttributeValue($"{@object}")},
+            { typeof(char), (object @object) => new AttributeValue{N = "" + Convert.ToInt32(@object) } },
             { typeof(char?), (object @object) =>
                 {
                     var attributeValue = new AttributeValue();
                     if (@object != null)
-                        attributeValue.S = $"{@object}";
+                        attributeValue.N = "" + Convert.ToInt32(@object);
                     else
                         attributeValue.NULL = true;
                     return attributeValue;
@@ -177,11 +177,11 @@ namespace Dynamo.ORM.Constants
                     return null;
                 }
             },
-            { typeof(byte), (AttributeValue attributeValue) => attributeValue.B.ToArray()[0] },
+            { typeof(byte), (AttributeValue attributeValue) => byte.Parse(attributeValue.N) },
             { typeof(byte?), (AttributeValue attributeValue) =>
                 {
                     if (!attributeValue.NULL)
-                        return (byte?)attributeValue.B.ToArray()[0];
+                        return (byte?)byte.Parse(attributeValue.N);
                     return null;
                 }
             },
@@ -192,11 +192,11 @@ namespace Dynamo.ORM.Constants
                     return null;
                 }
             },
-            { typeof(char), (AttributeValue attributeValue) => attributeValue.S[0] },
+            { typeof(char), (AttributeValue attributeValue) => (char)Convert.ToInt32(attributeValue.N) },
             { typeof(char?), (AttributeValue attributeValue) =>
                 {
                     if (!attributeValue.NULL)
-                        return (char?)attributeValue.S[0];
+                        return (char?)(char)Convert.ToInt32(attributeValue.N);
                     return null;
                 }
             },

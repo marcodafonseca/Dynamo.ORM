@@ -56,30 +56,62 @@ namespace Dynamo.ORM.Converters
             var variableName = $":val{valueIndex}";
             IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
 
-            if (IsExpressionNodeType(binaryExpression.Left.NodeType))
-                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Left as BinaryExpression, ref valueIndex, ref expressionString));
-            else if (IsMemberNode(binaryExpression.Left as Expression))
+            if (binaryExpression.Left is UnaryExpression)
             {
-                var propertyName = GetPropertyReference(binaryExpression.Left);
-
-                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(binaryExpression.Right)));
-
-                expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
+                expressionValues = GetExpressionValues(binaryExpression.Left as UnaryExpression, ref valueIndex, ref expressionString);
+            }
+            else if (IsExpressionNodeType(binaryExpression.Left.NodeType))
+                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Left as BinaryExpression, ref valueIndex, ref expressionString));
+            else if (IsMemberNode(binaryExpression.Left))
+            {
+                AppedExpressionValue(binaryExpression, binaryExpression.Left, binaryExpression.Right, variableName, ref expressionValues, ref expressionString);
                 valueIndex++;
             }
 
-            if (IsExpressionNodeType(binaryExpression.Right.NodeType))
-                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Right as BinaryExpression, ref valueIndex, ref expressionString));
-            else if (IsMemberNode(binaryExpression.Right as Expression))
+            if (binaryExpression.Right is UnaryExpression)
             {
-                var propertyName = GetPropertyReference(binaryExpression.Right);
-
-                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(binaryExpression.Left)));
-                expressionString.Replace(binaryExpression.ToString(), $"{variableName} {binaryExpression.NodeType} {propertyName}");
+                expressionValues = GetExpressionValues(binaryExpression.Right as UnaryExpression, ref valueIndex, ref expressionString);
+            }
+            else if (IsExpressionNodeType(binaryExpression.Right.NodeType))
+                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Right as BinaryExpression, ref valueIndex, ref expressionString));
+            else if (IsMemberNode(binaryExpression.Right))
+            {
+                AppedExpressionValue(binaryExpression, binaryExpression.Right, binaryExpression.Left, variableName, ref expressionValues, ref expressionString);
                 valueIndex++;
             }
 
             return expressionValues.ToDictionary(s => s.Key, s => s.Value);
+        }
+
+        private static IDictionary<string, object> GetExpressionValues(UnaryExpression unaryExpression, ref int valueIndex, ref StringBuilder expressionString)
+        {
+            var variableName = $":val{valueIndex}";
+            IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
+
+            if (!IsMemberNode(unaryExpression.Operand))
+            {
+                expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(unaryExpression)));
+
+                expressionString.Replace(unaryExpression.ToString(), variableName);
+                valueIndex++;
+            }
+            else
+            {
+                var propertyName = GetPropertyReference(unaryExpression.Operand);
+
+                expressionString.Replace(unaryExpression.ToString(), propertyName);
+            }
+
+            return expressionValues.ToDictionary(s => s.Key, s => s.Value);
+        }
+
+        private static void AppedExpressionValue(BinaryExpression binaryExpression, Expression propertyExpression, Expression valueExpression, string variableName, ref IEnumerable<KeyValuePair<string, object>> expressionValues, ref StringBuilder expressionString)
+        {
+            var propertyName = GetPropertyReference(propertyExpression);
+
+            expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(valueExpression)));
+
+            expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
         }
 
         private static string GetPropertyReference(Expression expression) => Base.GetPropertyReference(expression.ToString());

@@ -13,10 +13,16 @@ namespace Dynamo.ORM.Constants
             { "GreaterThanOrEqual", ">=" },
             { "AndAlso", "AND" },
             { "OrElse", "OR" },
-            { "GreaterThan", ">" },
             { "NotEqual", "<>" },
+            { "GreaterThan", ">" },
             { "LessThan", "<" },
-            { "Equal", "=" }
+            { "Equal", "=" },
+            { "==", "=" },
+            { "!=", "<>" },
+            { "&&", "AND" },
+            { "||", "OR" },
+            { "|", "OR" },
+            { "&", "AND" },
         };
 
         internal static readonly IDictionary<Type, Func<Expression, object>> GetExpressionValues = new Dictionary<Type, Func<Expression, object>>

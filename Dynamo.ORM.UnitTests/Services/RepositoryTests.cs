@@ -1,7 +1,5 @@
 ﻿using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
-using Dynamo.ORM.Models;
 using Dynamo.ORM.Services;
 using System;
 using System.Collections.Generic;
@@ -42,13 +40,13 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
             await repository.Add(value);
 
-            var entity = await repository.Get<MockTestTable>(value.Id);
+            var entity = await repository.Get<TestModel>(value.Id);
 
             Assert.True(entity.IsEqual(value));
         }
@@ -62,17 +60,20 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
+            // Just added this line so other tests don't interfere with it when running them all together
+            value.Id = 3000;
+
             await repository.Add(value);
 
-            var entity1 = await repository.Get<MockTestTable>(value.Id);
+            var entity1 = await repository.Get<TestModel>(value.Id);
 
             await repository.Delete(value);
 
-            var entity2 = await repository.Get<MockTestTable>(value.Id);
+            var entity2 = await repository.Get<TestModel>(value.Id);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
@@ -88,17 +89,20 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
+            // Just added this line so other tests don't interfere with it when running them all together
+            value.Id = 3001;
+
             await repository.Add(value);
 
-            var entity1 = await repository.Get<MockTestTable>(value.Id);
+            var entity1 = await repository.Get<TestModel>(value.Id);
 
-            await repository.Delete<MockTestTable>(value.Id);
+            await repository.Delete<TestModel>(value.Id);
 
-            var entity2 = await repository.Get<MockTestTable>(value.Id);
+            var entity2 = await repository.Get<TestModel>(value.Id);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
@@ -113,13 +117,13 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
             await repository.Add(value);
 
-            var entity = await repository.Get<MockTestTable>(x => x.Id == 100);
+            var entity = await repository.Get<TestModel>(x => x.Id == 100);
 
             Assert.NotNull(entity);
             Assert.True(entity.IsEqual(value));
@@ -133,13 +137,13 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
             await repository.Add(value);
 
-            var entity = await repository.Get<MockTestTable>(x => x.Id == value.Id);
+            var entity = await repository.Get<TestModel>(x => x.Id == value.Id);
 
             Assert.NotNull(entity);
             Assert.True(entity.IsEqual(value));
@@ -153,14 +157,14 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
             var dateFilter = new DateTime(2018, 11, 16).ToUniversalTime();
 
             value.PopulateProperties();
 
             await repository.Add(value);
 
-            var entity1 = await repository.Get<MockTestTable>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100);
+            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
@@ -175,19 +179,22 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var value = new MockTestTable();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
+            // Just added this line so other tests don't interfere with it when running them all together
+            value.Id = 3003;
+
             await repository.Add(value);
 
-            var entity1 = await repository.Get<MockTestTable>(value.Id);
+            var entity1 = await repository.Get<TestModel>(value.Id);
 
             value.UpdateProperties();
 
             await repository.Update(value);
 
-            var entity2 = await repository.Get<MockTestTable>(value.Id);
+            var entity2 = await repository.Get<TestModel>(value.Id);
 
             Assert.False(entity1.IsEqual(value));
             Assert.False(entity1.IsEqual(entity2));
@@ -203,11 +210,11 @@ namespace Dynamo.ORM.UnitTests.Services
         {
             var repository = new Repository(client);
 
-            var values = new List<MockTestTable>();
+            var values = new List<TestModel>();
 
             for (int i = 10; i < 20; i++)
             {
-                var value = new MockTestTable();
+                var value = new TestModel();
 
                 value.PopulateProperties();
 
@@ -219,7 +226,7 @@ namespace Dynamo.ORM.UnitTests.Services
             foreach (var value in values)
                 await repository.Add(value);
 
-            var results = (await repository.List<MockTestTable>(x => x.Id < 20 && x.Id >= 10))
+            var results = (await repository.List<TestModel>(x => x.Id < 20 && x.Id >= 10))
                 .OrderBy(x => x.Id)
                 .ToList();
 
@@ -228,104 +235,5 @@ namespace Dynamo.ORM.UnitTests.Services
             for (int i = 0; i < results.Count; i++)
                 Assert.True(values[i].IsEqual(results[i]));
         }
-
-        /// <summary>
-        /// Test Repository's "Get" function using a boolean property
-        /// Expect item returned
-        /// </summary>
-        [Fact]
-        public async void TestBoolQuery_ExpectItemReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new MockTestTable();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entity = await repository.Get<MockTestTable>(x => x.Property4 == true && x.Id == value.Id);
-
-            Assert.NotNull(entity);
-            Assert.True(entity.IsEqual(value));
-        }
-
-        /// <summary>
-        /// Test filtering by a nullable field
-        /// </summary>
-        [Fact]
-        public async void TestQueryOnNullValue_ExpectItemReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new MockTestTable();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entity = await repository.List<MockTestTable>(x => x.Property6 == null);
-
-            var size = entity.Count;
-
-            Assert.NotEqual(0, size);
-        }
-    }
-
-    [DynamoDBTable("TESTS")]
-    class MockTestTable : Base
-    {
-        private DateTime property2;
-        private DateTime? property11;
-
-        [DynamoDBHashKey]
-        public int Id { get; set; }
-        public string Property1 { get; set; }
-        public DateTime Property2
-        {
-            get
-            {
-                return property2.ToUniversalTime();
-            }
-            set
-            {
-                property2 = value;
-            }
-        }
-        public int Property3 { get; set; }
-        public bool Property4 { get; set; }
-        public byte Property5 { get; set; }
-        public byte? Property6 { get; set; }
-        public byte[] Property7 { get; set; }
-        public bool? Property8 { get; set; }
-        public char Property9 { get; set; }
-        public char? Property10 { get; set; }
-        public DateTime? Property11
-        {
-            get
-            {
-                return property11?.ToUniversalTime();
-            }
-            set
-            {
-                property11 = value;
-            }
-        }
-        public decimal Property12 { get; set; }
-        public decimal? Property13 { get; set; }
-        public double Property14 { get; set; }
-        public double? Property15 { get; set; }
-        public float Property16 { get; set; }
-        public float? Property17 { get; set; }
-        public short Property18 { get; set; }
-        public short? Property19 { get; set; }
-        public long Property20 { get; set; }
-        public long? Property21 { get; set; }
-        public ushort Property22 { get; set; }
-        public ushort? Property23 { get; set; }
-        public ulong Property24 { get; set; }
-        public ulong? Property25 { get; set; }
-        public uint Property26 { get; set; }
-        public uint? Property27 { get; set; }
     }
 }
