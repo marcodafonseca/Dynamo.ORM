@@ -24,10 +24,10 @@ namespace Dynamo.ORM.Converters
 
             SanitizeExpression(expression, ref expressionString);
 
-            return result;
+            return result.ToDictionary(s => s.Key, s => s.Value);
         }
 
-        private static Dictionary<string, AttributeValue> ConvertExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
+        private static IDictionary<string, AttributeValue> ConvertExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
         {
             var expressionValues = GetExpressionValues(binaryExpression, ref valueIndex, ref expressionString);
 
@@ -36,7 +36,7 @@ namespace Dynamo.ORM.Converters
             return ConvertExpressionValues(expressionValues);
         }
 
-        private static Dictionary<string, AttributeValue> ConvertExpressionValues(IDictionary<string, object> expressionValues)
+        private static IDictionary<string, AttributeValue> ConvertExpressionValues(IEnumerable<KeyValuePair<string, object>> expressionValues)
         {
             var convertedExpressionValues = new Dictionary<string, AttributeValue>();
 
@@ -51,39 +51,38 @@ namespace Dynamo.ORM.Converters
             return convertedExpressionValues;
         }
 
-        private static IDictionary<string, object> GetExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
+        private static IEnumerable<KeyValuePair<string, object>> GetExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
         {
             var variableName = $":val{valueIndex}";
             IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
 
-            if (binaryExpression.Left is UnaryExpression)
-            {
-                expressionValues = GetExpressionValues(binaryExpression.Left as UnaryExpression, ref valueIndex, ref expressionString);
-            }
-            else if (IsExpressionNodeType(binaryExpression.Left.NodeType))
-                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Left as BinaryExpression, ref valueIndex, ref expressionString));
-            else if (IsMemberNode(binaryExpression.Left))
-            {
-                AppedExpressionValue(binaryExpression, binaryExpression.Left, binaryExpression.Right, variableName, ref expressionValues, ref expressionString);
-                valueIndex++;
-            }
+            expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression, binaryExpression.Left, binaryExpression.Right, ref valueIndex, ref expressionString));
+            expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression, binaryExpression.Right, binaryExpression.Left, ref valueIndex, ref expressionString));
 
-            if (binaryExpression.Right is UnaryExpression)
-            {
-                expressionValues = GetExpressionValues(binaryExpression.Right as UnaryExpression, ref valueIndex, ref expressionString);
-            }
-            else if (IsExpressionNodeType(binaryExpression.Right.NodeType))
-                expressionValues = expressionValues.Union(GetExpressionValues(binaryExpression.Right as BinaryExpression, ref valueIndex, ref expressionString));
-            else if (IsMemberNode(binaryExpression.Right))
-            {
-                AppedExpressionValue(binaryExpression, binaryExpression.Right, binaryExpression.Left, variableName, ref expressionValues, ref expressionString);
-                valueIndex++;
-            }
-
-            return expressionValues.ToDictionary(s => s.Key, s => s.Value);
+            return expressionValues;
         }
 
-        private static IDictionary<string, object> GetExpressionValues(UnaryExpression unaryExpression, ref int valueIndex, ref StringBuilder expressionString)
+        private static IEnumerable<KeyValuePair<string, object>> GetExpressionValues(BinaryExpression binaryExpression, Expression primaryExpression, Expression secondaryExpression, ref int valueIndex, ref StringBuilder expressionString)
+        {
+            var variableName = $":val{valueIndex}";
+            IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
+
+            if (primaryExpression is UnaryExpression)
+            {
+                expressionValues = expressionValues.Union(GetExpressionValues(primaryExpression as UnaryExpression, ref valueIndex, ref expressionString));
+            }
+            else if (IsExpressionNodeType(primaryExpression.NodeType))
+                expressionValues = expressionValues.Union(GetExpressionValues(primaryExpression as BinaryExpression, ref valueIndex, ref expressionString));
+            else if (IsMemberNode(primaryExpression))
+            {
+                AppedExpressionValue(binaryExpression, primaryExpression, secondaryExpression, variableName, ref expressionValues, ref expressionString);
+                valueIndex++;
+            }
+
+            return expressionValues;
+        }
+
+        private static IEnumerable<KeyValuePair<string, object>> GetExpressionValues(UnaryExpression unaryExpression, ref int valueIndex, ref StringBuilder expressionString)
         {
             var variableName = $":val{valueIndex}";
             IEnumerable<KeyValuePair<string, object>> expressionValues = new Dictionary<string, object>();
@@ -102,7 +101,7 @@ namespace Dynamo.ORM.Converters
                 expressionString.Replace(unaryExpression.ToString(), propertyName);
             }
 
-            return expressionValues.ToDictionary(s => s.Key, s => s.Value);
+            return expressionValues;
         }
 
         private static void AppedExpressionValue(BinaryExpression binaryExpression, Expression propertyExpression, Expression valueExpression, string variableName, ref IEnumerable<KeyValuePair<string, object>> expressionValues, ref StringBuilder expressionString)
@@ -137,7 +136,10 @@ namespace Dynamo.ORM.Converters
 
         private static bool IsExpressionNodeType(ExpressionType nodeType)
         {
-            if (nodeType != ExpressionType.MemberAccess && nodeType != ExpressionType.Constant && nodeType != ExpressionType.New)
+            if (nodeType != ExpressionType.MemberAccess &&
+                nodeType != ExpressionType.Constant &&
+                nodeType != ExpressionType.New &&
+                nodeType != ExpressionType.Call)
                 return true;
             return false;
         }
