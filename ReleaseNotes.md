@@ -1,5 +1,9 @@
 # Release Notes
 
+### Version 0.1.0.0
+* Resolved Issue #1 "Can't call inline functions in expressions" - https://github.com/marcodafonseca/Dynamo.ORM/issues/1
+* Resolved Issue #2 "Can't query database with particular types" - https://github.com/marcodafonseca/Dynamo.ORM/issues/2
+
 ### Version 0.0.4.0
 * Added support for more data types
   * byte

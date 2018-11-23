@@ -12,37 +12,19 @@
     <PackageTags>async AWS DynamoDb ORM .Net-Core .Net-Standard</PackageTags>
     <PackageReleaseNotes>This is still in alpha
 
+Please don't hesitate to log issues or requests on GitHub.
+We are working everyday to make this more and more robust to ensure it will help more developers.
+
 -- Release Notes --
-Added support for more data types
-- byte
-- byte?
-- byte[]
-- char
-- char?
-- decimal
-- decimal?
-- double
-- double?
-- float
-- float?
-- Int16 (short)
-- Int16? (short?)
-- Int64 (long)
-- Int64? (long?)
-- UInt16 (ushort)
-- UInt16? (ushort?)
-- UInt32 (uint)
-- UInt32? (uint?)
-- UInt64 (ulong)
-- UInt64? (ulong?)
-Increased support for nullable types
+Resolved Issue #1 "Can't call inline functions in expressions" - https://github.com/marcodafonseca/Dynamo.ORM/issues/1
+Resolved Issue #2 "Can't query database with particular types" - https://github.com/marcodafonseca/Dynamo.ORM/issues/2
 
 Full history of release notes can be found on the GitHub page</PackageReleaseNotes>
-    <AssemblyVersion>0.0.4.0</AssemblyVersion>
-    <FileVersion>0.0.4.0</FileVersion>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>Dynamo.ORM</PackageId>
-    <Version>0.0.4.0</Version>
+    <Version>0.1.0.0</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Dev200 Pty. LTD</Copyright>
     <PackageIconUrl>https://dev200.co.za/images/logo.png</PackageIconUrl>

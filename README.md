@@ -3,6 +3,9 @@ An async ORM built for Amazon Web Service's DynamoDb in .Net Standard
 
 **This is still in alpha**
 
+Please don't hesitate to log issues or requests on GitHub.
+We are working everyday to make this more and more robust to ensure it will help more developers.
+
 The examples below use the local Amazon DynamoDb you would setup on your machine
 
 ## Example Usage
@@ -63,30 +66,9 @@ await repository.Delete<PersonModel>(1);
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.0.4.0
-* Added support for more data types
-  * byte
-  * byte?
-  * byte[]
-  * char
-  * char?
-  * decimal
-  * decimal?
-  * double
-  * double?
-  * float
-  * float?
-  * Int16 (short)
-  * Int16? (short?)
-  * Int64 (long)
-  * Int64? (long?)
-  * UInt16 (ushort)
-  * UInt16? (ushort?)
-  * UInt32 (uint)
-  * UInt32? (uint?)
-  * UInt64 (ulong)
-  * UInt64? (ulong?)
-* Increased support for nullable types
+### Version 0.1.0.0
+* Resolved Issue #1 "Can't call inline functions in expressions" - https://github.com/marcodafonseca/Dynamo.ORM/issues/1
+* Resolved Issue #2 "Can't query database with particular types" - https://github.com/marcodafonseca/Dynamo.ORM/issues/2
 
 ## Important Links
 * [Contributing Guidlines](CONTRIBUTING.md)
