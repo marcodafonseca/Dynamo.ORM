@@ -96,10 +96,7 @@ namespace Dynamo.ORM.Services
                 ProjectionExpression = string.Join(", ", expressionAttributeNames.Keys),
                 ExpressionAttributeNames = expressionAttributeNames
             };
-
-            if (expression == null)
-                expression = (x) => 1 == 1;
-
+            
             var expressionString = new StringBuilder();
 
             dynamoDbRequest.ExpressionAttributeValues = Converters.ExpressionValues.ConvertExpressionValues(expression, ref expressionString);
@@ -113,7 +110,7 @@ namespace Dynamo.ORM.Services
             else if (results.Count == 0)
                 return null;
 
-            return results.Single().Map<T>();
+            return results.SingleOrDefault()?.Map<T>();
         }
 
         public async Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null) where T : Base, new()

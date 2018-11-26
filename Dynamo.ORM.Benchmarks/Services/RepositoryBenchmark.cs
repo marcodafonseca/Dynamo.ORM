@@ -11,7 +11,7 @@ namespace Dynamo.ORM.Benchmarks.Services
 {
     internal class RepositoryBenchmark : IBenchmark
     {
-        private string repositoryName = "RepositoryBenchmark";
+        private readonly string repositoryName = "RepositoryBenchmark";
         private readonly Repository repository;
 
         public RepositoryBenchmark(IAmazonDynamoDB amazonDynamo)
@@ -155,7 +155,6 @@ namespace Dynamo.ORM.Benchmarks.Services
 
         public async Task<Result> ListItemsComplex(int iteration)
         {
-            var model = new Model();
             var result = new Result();
             var stopwatch = new Stopwatch();
 
@@ -163,8 +162,6 @@ namespace Dynamo.ORM.Benchmarks.Services
 
             for (int i = 0; i < iteration; ++i)
             {
-                model.Id = i;
-
                 await repository.List<Model>(x => x.Property1 != null);
             }
 
@@ -172,7 +169,7 @@ namespace Dynamo.ORM.Benchmarks.Services
 
             result.Count = iteration;
             result.TimeTaken = stopwatch.Elapsed;
-            result.Description = $"Delete {iteration} items in table (Complex)";
+            result.Description = $"List {iteration} items in table (Complex)";
             result.Service = repositoryName;
             result.Simple = false;
             result.Method = "List";
@@ -182,7 +179,6 @@ namespace Dynamo.ORM.Benchmarks.Services
 
         public async Task<Result> ListItemsSimple(int iteration)
         {
-            var model = new Model();
             var result = new Result();
             var stopwatch = new Stopwatch();
 
@@ -190,8 +186,6 @@ namespace Dynamo.ORM.Benchmarks.Services
 
             for (int i = 0; i < iteration; ++i)
             {
-                model.Id = i;
-
                 await repository.List<Model>();
             }
 
@@ -199,7 +193,7 @@ namespace Dynamo.ORM.Benchmarks.Services
 
             result.Count = iteration;
             result.TimeTaken = stopwatch.Elapsed;
-            result.Description = $"Delete {iteration} items in table (Simple)";
+            result.Description = $"List {iteration} items in table (Simple)";
             result.Service = repositoryName;
             result.Simple = true;
             result.Method = "List";

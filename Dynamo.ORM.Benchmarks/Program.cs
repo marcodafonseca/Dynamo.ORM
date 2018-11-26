@@ -73,6 +73,7 @@ namespace Dynamo.ORM.Benchmarks
             #endregion
 
             IBenchmark[] benchmarks = new IBenchmark[] {
+                new AwsSdkBenchmark(client),
                 new RepositoryBenchmark(client)
             };
 
