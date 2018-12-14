@@ -1,15 +1,14 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
-using Dynamo.ORM.Models;
+using Dynamo.ORM.Exceptions;
 using Dynamo.ORM.Extensions;
+using Dynamo.ORM.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
-using System.Linq.Expressions;
-using System.Linq;
-using Dynamo.ORM.Exceptions;
-using Dynamo.ORM.Constants;
 
 namespace Dynamo.ORM.Services
 {

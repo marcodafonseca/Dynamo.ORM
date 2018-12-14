@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Text;
 
 namespace Dynamo.ORM.Constants
 {
@@ -165,6 +164,17 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
+
+            { typeof(object), (object @object) => 
+                {
+                    var attributeValue = new AttributeValue();
+                    if (@object == null)
+                        attributeValue.NULL = true;
+                    else
+                        attributeValue.M = ToDictionary(@object);
+                    return attributeValue;
+                }
+            },
         };
 
         internal static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
@@ -281,6 +291,62 @@ namespace Dynamo.ORM.Constants
                     return null;
                 }
             },
+
+            { typeof(object), (AttributeValue AttributeValue) =>
+                {
+                    if (!AttributeValue.NULL)
+                        return AttributeValue.M;
+                    return null;
+                }
+            }
         };
+
+        internal static object FromDictionary(Type type, Dictionary<string, AttributeValue> value)
+        {
+            var result = Activator.CreateInstance(type);
+
+            var properties = type.GetProperties();
+
+            foreach (var property in properties)
+            {
+                if (property.SetMethod.IsPublic && value.ContainsKey(property.Name))
+                {
+                    if (ConvertToValue.ContainsKey(property.PropertyType))
+                    {
+                        property.SetValue(result, ConvertToValue[property.PropertyType](value[property.Name]));
+                    }
+                    else if (property.PropertyType.IsClass)
+                    {
+                        property.SetValue(result, FromDictionary(property.PropertyType, value[property.Name].M));
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        internal static Dictionary<string, AttributeValue> ToDictionary(object @object)
+        {
+            var type = @object.GetType();
+            var properties = type.GetProperties();
+            var dictionary = new Dictionary<string, AttributeValue>();
+
+            foreach (var property in properties)
+            {
+                if (property.SetMethod.IsPublic)
+                {
+                    if (ConvertToAttributeValue.ContainsKey(property.PropertyType))
+                    {
+                        dictionary.Add(property.Name, ConvertToAttributeValue[property.PropertyType](property.GetValue(@object)));
+                    }
+                    else if (property.PropertyType.IsClass)
+                    {
+                        dictionary.Add(property.Name, new AttributeValue { M = ToDictionary(property.GetValue(@object)) });
+                    }
+                }
+            }
+
+            return dictionary;
+        }
     }
 }

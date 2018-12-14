@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Dynamo.ORM.Extensions
 {
@@ -41,10 +40,21 @@ namespace Dynamo.ORM.Extensions
         {
             var entity = new T();
 
-            foreach (var property in typeof(T).GetProperties())
+            var properties = typeof(T).GetProperties();
+
+            foreach (var property in properties)
             {
                 if (values.ContainsKey(property.Name))
-                    property.SetValue(entity, AttributeValueConverter.ConvertToValue[property.PropertyType](values[property.Name]));
+                {
+                    if (AttributeValueConverter.ConvertToValue.ContainsKey(property.PropertyType))
+                        property.SetValue(entity, AttributeValueConverter.ConvertToValue[property.PropertyType](values[property.Name]));
+                    else if (property.PropertyType.IsClass)
+                    {
+                        var value = (Dictionary<string, AttributeValue>)AttributeValueConverter.ConvertToValue[typeof(object)](values[property.Name]);
+
+                        property.SetValue(entity, AttributeValueConverter.FromDictionary(property.PropertyType, value));
+                    }
+                }
             }
 
             return entity;
@@ -100,7 +110,12 @@ namespace Dynamo.ORM.Extensions
                 .Where(x => includeKeys || !IsKeyProperty(x));
 
             foreach (var property in properties)
-                results.Add(property.Name, AttributeValueConverter.ConvertToAttributeValue[property.PropertyType](property.GetValue(entity)));
+            {
+                if (AttributeValueConverter.ConvertToAttributeValue.ContainsKey(property.PropertyType))
+                    results.Add(property.Name, AttributeValueConverter.ConvertToAttributeValue[property.PropertyType](property.GetValue(entity)));
+                else if (property.PropertyType.IsClass)
+                    results.Add(property.Name, AttributeValueConverter.ConvertToAttributeValue[typeof(object)](property.GetValue(entity)));
+            }
 
             return results;
         }

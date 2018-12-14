@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace Dynamo.ORM.UnitTests
 {
@@ -15,7 +14,16 @@ namespace Dynamo.ORM.UnitTests
             foreach (var property in properties)
             {
                 if (property.SetMethod.IsPublic)
-                    property.SetValue(entity, populate[property.PropertyType]);
+                {
+                    if (populate.ContainsKey(property.PropertyType))
+                        property.SetValue(entity, populate[property.PropertyType]);
+                    else
+                    {
+                        var value = Activator.CreateInstance(property.PropertyType);
+                        value.PopulateProperties();
+                        property.SetValue(entity, value);
+                    }
+                }
             }
         }
 
@@ -27,7 +35,16 @@ namespace Dynamo.ORM.UnitTests
             foreach (var property in properties)
             {
                 if (property.SetMethod.IsPublic)
-                    property.SetValue(entity, update[property.PropertyType]);
+                {
+                    if (populate.ContainsKey(property.PropertyType))
+                        property.SetValue(entity, update[property.PropertyType]);
+                    else
+                    {
+                        var value = Activator.CreateInstance(property.PropertyType);
+                        value.UpdateProperties();
+                        property.SetValue(entity, value);
+                    }
+                }
             }
         }
 
@@ -45,6 +62,8 @@ namespace Dynamo.ORM.UnitTests
 
                 if (property.PropertyType.IsArray)
                     result = IsEqualArray(entityProperty as ICollection, valueProperty as ICollection);
+                else if (!populate.ContainsKey(property.PropertyType))
+                    result = IsEqual(entityProperty, valueProperty);
                 else if (!Equals(entityProperty, valueProperty))
                     result = false;
             }
