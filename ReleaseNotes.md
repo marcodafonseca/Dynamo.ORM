@@ -1,5 +1,8 @@
 # Release Notes
 
+### Version 0.1.1.0
+* Added ability to read and write mapped property fields
+
 ### Version 0.1.0.0
 * Resolved [Can't call inline functions in expressions](https://github.com/marcodafonseca/Dynamo.ORM/issues/1)
 * Resolved [Can't query database with particular types](https://github.com/marcodafonseca/Dynamo.ORM/issues/2)

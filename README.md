@@ -1,7 +1,7 @@
 # Dynamo.ORM
 An async ORM built for Amazon Web Service's DynamoDb in .Net Standard
 
-**This is still in alpha**
+**This is still in beta**
 
 Please don't hesitate to log issues or requests on GitHub.
 We are working everyday to make this more and more robust to ensure it will help more developers.
@@ -66,9 +66,8 @@ await repository.Delete<PersonModel>(1);
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.1.0.0
-* Resolved [Can't call inline functions in expressions](https://github.com/marcodafonseca/Dynamo.ORM/issues/1)
-* Resolved [Can't query database with particular types](https://github.com/marcodafonseca/Dynamo.ORM/issues/2)
+### Version 0.1.1.0
+* Added ability to read and write mapped property fields
 
 ## Important Links
 * [Contributing Guidlines](CONTRIBUTING.md)
