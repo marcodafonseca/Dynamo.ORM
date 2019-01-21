@@ -164,7 +164,6 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
-
             { typeof(object), (object @object) => 
                 {
                     var attributeValue = new AttributeValue();
@@ -175,6 +174,26 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
+            { typeof(Guid), (object @object) =>
+                {
+                    var attributeValue = new AttributeValue();
+                    if (@object == null)
+                        attributeValue.NULL = true;
+                    else
+                        attributeValue.S = ((Guid)@object).ToString();
+                    return attributeValue;
+                }
+            },
+            { typeof(Guid?), (object @object) =>
+                {
+                    var attributeValue = new AttributeValue();
+                    if (@object == null)
+                        attributeValue.NULL = true;
+                    else
+                        attributeValue.S = ((Guid)@object).ToString();
+                    return attributeValue;
+                }
+            }
         };
 
         internal static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
@@ -291,14 +310,27 @@ namespace Dynamo.ORM.Constants
                     return null;
                 }
             },
-
-            { typeof(object), (AttributeValue AttributeValue) =>
+            { typeof(object), (AttributeValue attributeValue) =>
                 {
-                    if (!AttributeValue.NULL)
-                        return AttributeValue.M;
+                    if (!attributeValue.NULL)
+                        return attributeValue.M;
                     return null;
                 }
-            }
+            },
+            { typeof(Guid), (AttributeValue attributeValue) =>
+                {
+                    if (!attributeValue.NULL)
+                        return new Guid(attributeValue.S);
+                    return null;
+                }
+            },
+            { typeof(Guid?), (AttributeValue attributeValue) =>
+                {
+                    if (!attributeValue.NULL)
+                        return new Guid(attributeValue.S);
+                    return null;
+                }
+            },
         };
 
         internal static object FromDictionary(Type type, Dictionary<string, AttributeValue> value)

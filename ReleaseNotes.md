@@ -1,5 +1,8 @@
 # Release Notes
 
+### Version 0.1.2.0
+* Added Guid support
+
 ### Version 0.1.1.0
 * Added ability to read and write mapped property fields
 

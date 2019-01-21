@@ -124,6 +124,8 @@ namespace Dynamo.ORM.UnitTests
             { typeof(uint?), null },
             { typeof(ulong), (ulong)100 },
             { typeof(ulong?), null },
+            { typeof(Guid), Guid.NewGuid() },
+            { typeof(Guid?), null }
         };
 
         private static readonly IDictionary<Type, object> update = new Dictionary<Type, object>
@@ -156,6 +158,8 @@ namespace Dynamo.ORM.UnitTests
             { typeof(uint?), (uint?)100 },
             { typeof(ulong), (ulong)100 },
             { typeof(ulong?), (ulong)100 },
+            { typeof(Guid), Guid.NewGuid() },
+            { typeof(Guid?), null }
         };
     }
 }

@@ -59,5 +59,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public ulong? Property25 { get; set; }
         public uint Property26 { get; set; }
         public uint? Property27 { get; set; }
+        public Guid Property28 { get; set; }
+        public Guid? Property29 { get; set; }
     }
 }

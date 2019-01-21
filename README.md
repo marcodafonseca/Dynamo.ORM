@@ -66,8 +66,8 @@ await repository.Delete<PersonModel>(1);
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.1.1.0
-* Added ability to read and write mapped property fields
+### Version 0.1.2.0
+* Added Guid support
 
 ## Important Links
 * [Contributing Guidlines](CONTRIBUTING.md)

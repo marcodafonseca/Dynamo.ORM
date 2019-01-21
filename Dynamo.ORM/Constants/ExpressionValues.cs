@@ -54,8 +54,9 @@ namespace Dynamo.ORM.Constants
             { typeof(uint?), (expression) => Expression.Lambda<Func<uint?>>(expression).Compile()() },
             { typeof(ulong), (expression) => Expression.Lambda<Func<ulong>>(expression).Compile()() },
             { typeof(ulong?), (expression) => Expression.Lambda<Func<ulong?>>(expression).Compile()() },
-
             { typeof(object), (expression) => Expression.Lambda<Func<object>>(expression).Compile()() },
+            { typeof(Guid), (expression) => Expression.Lambda<Func<Guid>>(expression).Compile()() },
+            { typeof(Guid?), (expression) => Expression.Lambda<Func<Guid?>>(expression).Compile()() },
         };
     }
 }
