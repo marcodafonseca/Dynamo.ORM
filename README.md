@@ -66,8 +66,8 @@ await repository.Delete<PersonModel>(1);
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.1.2.0
-* Added Guid support
+### Version 0.1.3.0
+* Added transaction support for Add, Update and Delete
 
 ## Important Links
 * [Contributing Guidlines](CONTRIBUTING.md)

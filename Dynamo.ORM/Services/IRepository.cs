@@ -15,5 +15,8 @@ namespace Dynamo.ORM.Services
         Task Update<T>(T entity) where T : Base, new();
         Task Delete<T>(object partitionKey, object sortKey = null) where T : Base, new();
         Task Delete<T>(T entity) where T : Base, new();
+        void BeginWriteTransaction();
+        Task CommitWriteTransaction();
+        void RollbackWriteTransaction();
     }
 }

@@ -1,5 +1,8 @@
 # Release Notes
 
+### Version 0.1.3.0
+* Added transaction support for Add, Update and Delete
+
 ### Version 0.1.2.0
 * Added Guid support
 

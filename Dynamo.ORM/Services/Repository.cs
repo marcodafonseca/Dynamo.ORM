@@ -16,6 +16,8 @@ namespace Dynamo.ORM.Services
     {
         private readonly IAmazonDynamoDB amazonDynamoDB;
 
+        private List<TransactWriteItem> writeActions;
+
         public Repository(IAmazonDynamoDB amazonDynamoDB)
         {
             this.amazonDynamoDB = amazonDynamoDB;
@@ -29,7 +31,13 @@ namespace Dynamo.ORM.Services
                 Item = entity.Map(true)
             };
 
-            await amazonDynamoDB.PutItemAsync(request);
+            if (writeActions == null)
+                await amazonDynamoDB.PutItemAsync(request);
+            else
+                writeActions.Add(new TransactWriteItem
+                {
+                    Put = request.Map()
+                });
         }
 
         public async Task Delete<T>(T entity) where T : Base, new()
@@ -40,9 +48,15 @@ namespace Dynamo.ORM.Services
                 Key = entity.GetKey()
             };
 
-            await amazonDynamoDB.DeleteItemAsync(request);
+            if (writeActions == null)
+                await amazonDynamoDB.DeleteItemAsync(request);
+            else
+                writeActions.Add(new TransactWriteItem
+                {
+                    Delete = request.Map()
+                });
         }
-        
+
         public async Task Delete<T>(object partitionKey, object sortKey = null) where T : Base, new()
         {
             var generic = new T();
@@ -54,7 +68,13 @@ namespace Dynamo.ORM.Services
                 Key = key
             };
 
-            await amazonDynamoDB.DeleteItemAsync(request);
+            if (writeActions == null)
+                await amazonDynamoDB.DeleteItemAsync(request);
+            else
+                writeActions.Add(new TransactWriteItem
+                {
+                    Delete = request.Map()
+                });
         }
 
         public async Task<T> Get<T>(object partitionKey, object sortKey = null) where T : Base, new()
@@ -95,7 +115,7 @@ namespace Dynamo.ORM.Services
                 ProjectionExpression = string.Join(", ", expressionAttributeNames.Keys),
                 ExpressionAttributeNames = expressionAttributeNames
             };
-            
+
             var expressionString = new StringBuilder();
 
             dynamoDbRequest.ExpressionAttributeValues = Converters.ExpressionValues.ConvertExpressionValues(expression, ref expressionString);
@@ -153,7 +173,34 @@ namespace Dynamo.ORM.Services
                 Key = entity.GetKey()
             };
 
-            await amazonDynamoDB.UpdateItemAsync(request);
+            if (writeActions == null)
+                await amazonDynamoDB.UpdateItemAsync(request);
+            else
+                writeActions.Add(new TransactWriteItem
+                {
+                    Update = request.Map()
+                });
+        }
+
+        public void BeginWriteTransaction()
+        {
+            writeActions = new List<TransactWriteItem>();
+        }
+
+        public async Task CommitWriteTransaction()
+        {
+            var request = new TransactWriteItemsRequest
+            {
+                TransactItems = writeActions,
+                ReturnConsumedCapacity = ReturnConsumedCapacity.TOTAL
+            };
+
+            var response = await amazonDynamoDB.TransactWriteItemsAsync(request);
+        }
+
+        public void RollbackWriteTransaction()
+        {
+            writeActions = null;
         }
     }
 }
