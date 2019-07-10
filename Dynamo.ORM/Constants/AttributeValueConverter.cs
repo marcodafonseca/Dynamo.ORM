@@ -130,7 +130,16 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
-            { typeof(string), (object @object) => new AttributeValue($"{@object}") },
+            { typeof(string), (object @object) =>
+                {
+                    var attributeValue = new AttributeValue();
+                    if (!string.IsNullOrWhiteSpace($"{@object}"))
+                        attributeValue.S = $"{@object}";
+                    else
+                        attributeValue.NULL = true;
+                    return attributeValue;
+                }
+            },
             { typeof(ushort), (object @object) => new AttributeValue{ N = $"{@object}" } },
             { typeof(ushort?), (object @object) =>
                 {
@@ -164,7 +173,7 @@ namespace Dynamo.ORM.Constants
                     return attributeValue;
                 }
             },
-            { typeof(object), (object @object) => 
+            { typeof(object), (object @object) =>
                 {
                     var attributeValue = new AttributeValue();
                     if (@object == null)
@@ -285,7 +294,13 @@ namespace Dynamo.ORM.Constants
                     return null;
                 }
             },
-            { typeof(string), (AttributeValue attributeValue) => attributeValue.S },
+            { typeof(string), (AttributeValue attributeValue) =>
+                {
+                    if (!attributeValue.NULL)
+                        return attributeValue.S;
+                    return null;
+                }
+            },
             { typeof(ushort), (AttributeValue attributeValue) => ushort.Parse(attributeValue.N) },
             { typeof(ushort?), (AttributeValue attributeValue) =>
                 {
