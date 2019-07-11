@@ -1,6 +1,7 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 using Dynamo.ORM.Models;
 using System;
+using System.ComponentModel;
 
 namespace Dynamo.ORM.UnitTests.Services
 {
@@ -13,6 +14,10 @@ namespace Dynamo.ORM.UnitTests.Services
         [DynamoDBHashKey]
         public int Id { get; set; }
         public string Property1 { get; set; }
+        [DefaultValue(null)]
+        public string EmptyString1 { get; set; }
+        [DefaultValue("")]
+        public string EmptyString2 { get; set; }
         public DateTime Property2
         {
             get

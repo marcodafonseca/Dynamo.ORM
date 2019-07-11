@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 
 namespace Dynamo.ORM.UnitTests
 {
@@ -13,10 +15,16 @@ namespace Dynamo.ORM.UnitTests
 
             foreach (var property in properties)
             {
-                if (property.SetMethod.IsPublic)
+                if (property.SetMethod?.IsPublic ?? false)
                 {
                     if (populate.ContainsKey(property.PropertyType))
-                        property.SetValue(entity, populate[property.PropertyType]);
+                    {
+                        var defaultValue = (DefaultValueAttribute)property.GetCustomAttributes(typeof(DefaultValueAttribute), true).FirstOrDefault();
+                        if (defaultValue != null)
+                            property.SetValue(entity, defaultValue.Value);
+                        else
+                            property.SetValue(entity, populate[property.PropertyType]);
+                    }
                     else
                     {
                         var value = Activator.CreateInstance(property.PropertyType);
