@@ -39,8 +39,8 @@ namespace Dynamo.ORM.Constants
             { typeof(ulong), (object @object) => new AttributeValue { N = $"{@object}" } },
             { typeof(ulong?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
             { typeof(object), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.M = ToDictionary(@object)) },
-            { typeof(Guid), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = ((Guid)@object).ToString()) },
-            { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = ((Guid)@object).ToString()) }
+            { typeof(Guid), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
+            { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) }
         };
 
         internal static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
@@ -147,6 +147,5 @@ namespace Dynamo.ORM.Constants
                 return nonNullFunction();
             return null;
         }
-
     }
 }
