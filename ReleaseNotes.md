@@ -1,5 +1,8 @@
 # Release Notes
 
+### Version 0.1.4.3
+* Added support for null/empty strings
+
 ### Version 0.1.3.0
 * Added transaction support for Add, Update and Delete
 

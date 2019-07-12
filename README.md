@@ -66,8 +66,8 @@ await repository.Delete<PersonModel>(1);
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.1.3.0
-* Added transaction support for Add, Update and Delete
+### Version 0.1.4.3
+* Added support for null/empty strings
 
 ## Important Links
 * [Contributing Guidlines](CONTRIBUTING.md)
