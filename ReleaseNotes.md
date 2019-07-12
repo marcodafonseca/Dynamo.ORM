@@ -1,7 +1,7 @@
 # Release Notes
 
 ### Version 0.1.4.3
-* Added support for null/empty strings
+* Resolved [Added support for null/empty strings](https://github.com/marcodafonseca/Dynamo.ORM/issues/3)
 
 ### Version 0.1.3.0
 * Added transaction support for Add, Update and Delete
