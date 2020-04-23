@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Amazon.DynamoDBv2.DataModel;
+using Dynamo.ORM.Converters;
+using Dynamo.ORM.Models;
+using System;
+using System.Linq.Expressions;
 using System.Text;
 using Xunit;
-using Dynamo.ORM.Converters;
-using System.Linq.Expressions;
-using Dynamo.ORM.Models;
-using Amazon.DynamoDBv2.DataModel;
 
 namespace Dynamo.ORM.UnitTests.Converters
 {

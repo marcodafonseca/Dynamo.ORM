@@ -79,15 +79,16 @@ namespace Dynamo.ORM.UnitTests.Services
     }
 
     [DynamoDBTable("TESTS")]
-    class ComplexData : Base
+    internal class ComplexData : Base
     {
         [DynamoDBHashKey]
         public int Id { get; set; }
+
         public TestModel TestModel { get; set; }
         public ComplexChildData ChildModel { get; set; }
     }
 
-    class ComplexChildData
+    internal class ComplexChildData
     {
         public TestModel TestModel { get; set; }
     }

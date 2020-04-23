@@ -1,9 +1,11 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
 using Dynamo.ORM.Constants;
+using Dynamo.ORM.Converters;
 using Dynamo.ORM.Exceptions;
 using Dynamo.ORM.Models;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -44,15 +46,34 @@ namespace Dynamo.ORM.Extensions
 
             foreach (var property in properties)
             {
+                var propertyType = property.PropertyType;
+
                 if (values.ContainsKey(property.Name))
                 {
-                    if (AttributeValueConverter.ConvertToValue.ContainsKey(property.PropertyType))
-                        property.SetValue(entity, AttributeValueConverter.ConvertToValue[property.PropertyType](values[property.Name]));
-                    else if (property.PropertyType.IsClass)
+                    if (AttributeValueConverter.ConvertToValue.ContainsKey(propertyType))
+                        property.SetValue(entity, AttributeValueConverter.ConvertToValue[propertyType](values[property.Name]));
+                    else if (propertyType.IsArray || (propertyType.IsGenericType && propertyType.GetInterfaces().Contains(typeof(IEnumerable))))
+                    {
+                        var declaredType = propertyType.GetDeclaringType();
+
+                        if (ListAttributeValueConverter.AllTypes.Contains(declaredType))
+                        {
+                            var value = AttributeValueConverter.ConvertToArrayValue(declaredType, values[property.Name]);
+
+                            property.SetValue(entity, AttributeValueConverter.FromList(propertyType, value));
+                        }
+                        else if (declaredType.IsClass && !values[property.Name].NULL)
+                        {
+                            var value = values[property.Name].L;
+
+                            property.SetValue(entity, AttributeValueConverter.FromList(propertyType, value));
+                        }
+                    }
+                    else if (propertyType.IsClass)
                     {
                         var value = (Dictionary<string, AttributeValue>)AttributeValueConverter.ConvertToValue[typeof(object)](values[property.Name]);
 
-                        property.SetValue(entity, AttributeValueConverter.FromDictionary(property.PropertyType, value));
+                        property.SetValue(entity, AttributeValueConverter.FromDictionary(propertyType, value));
                     }
                 }
             }
@@ -111,13 +132,59 @@ namespace Dynamo.ORM.Extensions
 
             foreach (var property in properties)
             {
-                if (AttributeValueConverter.ConvertToAttributeValue.ContainsKey(property.PropertyType))
-                    results.Add(property.Name, AttributeValueConverter.ConvertToAttributeValue[property.PropertyType](property.GetValue(entity)));
-                else if (property.PropertyType.IsClass)
+                var propertyType = property.PropertyType;
+
+                if (AttributeValueConverter.ConvertToAttributeValue.ContainsKey(propertyType))
+                    results.Add(property.Name, AttributeValueConverter.ConvertToAttributeValue[propertyType](property.GetValue(entity)));
+                else if (propertyType.GetInterfaces().Contains(typeof(IEnumerable)))
+                {
+                    var elementType = propertyType.GetDeclaringType();
+
+                    results.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, ((IEnumerable)property.GetValue(entity)).GetEnumerator()));
+                }
+                else if (propertyType.IsClass)
                     results.Add(property.Name, AttributeValueConverter.ConvertToAttributeValue[typeof(object)](property.GetValue(entity)));
             }
 
             return results;
+        }
+
+        public static object CreateInstance(this Type type)
+        {
+            var parameterTypes = type.GetGenericArguments();
+
+            if (type.GetInterfaces().Any(x => x == typeof(IEnumerable)))
+            {
+                var baseType = typeof(List<>);
+
+                var genericType = baseType.MakeGenericType(parameterTypes);
+
+                return Activator.CreateInstance(genericType);
+            }
+            else
+            {
+                var parameters = new List<object>();
+
+                foreach (var parameterType in parameterTypes)
+                    parameters.Add(CreateInstance(parameterType));
+
+                if (parameters.Count > 0)
+                    return Activator.CreateInstance(type, parameters);
+                else
+                    return Activator.CreateInstance(type);
+            }
+        }
+
+        public static Array CreateInstance(this Type type, int size)
+        {
+            var typeArgument = type.GetDeclaringType();
+
+            return Array.CreateInstance(typeArgument, size);
+        }
+
+        public static Type GetDeclaringType(this Type type)
+        {
+            return type.DeclaringType ?? type.GetElementType() ?? type.GenericTypeArguments.FirstOrDefault();
         }
 
         private static bool IsKeyProperty(PropertyInfo propertyInfo)

@@ -1,8 +1,5 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 using Dynamo.ORM.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Dynamo.ORM.Benchmarks.Models
 {
@@ -11,6 +8,7 @@ namespace Dynamo.ORM.Benchmarks.Models
     {
         [DynamoDBHashKey]
         public int Id { get; set; }
+
         public string Property1 { get; set; } = "TEST";
         public string Property2 { get; set; } = "TEST";
         public string Property3 { get; set; } = "TEST";

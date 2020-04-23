@@ -1,12 +1,10 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
+using Dynamo.ORM.Exceptions;
 using Dynamo.ORM.Extensions;
 using Dynamo.ORM.Models;
-using Dynamo.ORM.Exceptions;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using Xunit;
-using Amazon.DynamoDBv2.Model;
 
 namespace Dynamo.ORM.UnitTests.Extensions
 {
@@ -124,6 +122,7 @@ namespace Dynamo.ORM.UnitTests.Extensions
     {
         [DynamoDBHashKey]
         public int Id { get; set; }
+
         public string Property1 { get; set; }
         public bool Property2 { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dynamo.ORM.Extensions;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -27,7 +28,7 @@ namespace Dynamo.ORM.UnitTests
                     }
                     else
                     {
-                        var value = Activator.CreateInstance(property.PropertyType);
+                        var value = property.PropertyType.CreateInstance();
                         value.PopulateProperties();
                         property.SetValue(entity, value);
                     }
@@ -48,7 +49,7 @@ namespace Dynamo.ORM.UnitTests
                         property.SetValue(entity, update[property.PropertyType]);
                     else
                     {
-                        var value = Activator.CreateInstance(property.PropertyType);
+                        var value = property.PropertyType.CreateInstance();
                         value.UpdateProperties();
                         property.SetValue(entity, value);
                     }
@@ -61,6 +62,10 @@ namespace Dynamo.ORM.UnitTests
             var result = true;
 
             var type = entity.GetType();
+
+            if (type.IsValueType || type == typeof(string))
+                return entity.Equals(value);
+
             var properties = type.GetProperties();
 
             foreach (var property in properties)
@@ -68,12 +73,20 @@ namespace Dynamo.ORM.UnitTests
                 var entityProperty = property.GetValue(entity);
                 var valueProperty = property.GetValue(value);
 
-                if (property.PropertyType.IsArray)
-                    result = IsEqualArray(entityProperty as ICollection, valueProperty as ICollection);
-                else if (!populate.ContainsKey(property.PropertyType))
-                    result = IsEqual(entityProperty, valueProperty);
-                else if (!Equals(entityProperty, valueProperty))
-                    result = false;
+                if (!string.IsNullOrWhiteSpace($"{entityProperty}{valueProperty}"))
+                    if (property.PropertyType.IsArray ||
+                        (property.PropertyType.IsGenericType && property.PropertyType.GetInterfaces().Contains(typeof(IEnumerable))))
+                    {
+                        if (!IsEqualArray(entityProperty as ICollection, valueProperty as ICollection))
+                            result = false;
+                    }
+                    else if (!populate.ContainsKey(property.PropertyType))
+                    {
+                        if (!IsEqual(entityProperty, valueProperty))
+                            result = false;
+                    }
+                    else if (!Equals(entityProperty, valueProperty))
+                        result = false;
             }
 
             return result;
@@ -95,7 +108,8 @@ namespace Dynamo.ORM.UnitTests
                     entityEnumerable.MoveNext();
                     valueEnumerable.MoveNext();
 
-                    result = IsEqual(entityEnumerable.Current, valueEnumerable.Current);
+                    if (!IsEqual(entityEnumerable.Current, valueEnumerable.Current))
+                        result = false;
                 }
             }
 
@@ -133,7 +147,18 @@ namespace Dynamo.ORM.UnitTests
             { typeof(ulong), (ulong)100 },
             { typeof(ulong?), null },
             { typeof(Guid), Guid.NewGuid() },
-            { typeof(Guid?), null }
+            { typeof(Guid?), null },
+            { typeof(string[]), new string[]{ "test" } },
+            { typeof(IList<string>), new List<string>{ "string" } },
+            { typeof(IList<Services.ChildModel>), new List<Services.ChildModel>
+                {
+                    new Services.ChildModel{
+                        Property1 = "test"
+                    }
+                }
+            },
+            { typeof(int[]), new int[]{ 12 } },
+            { typeof(IList<int>), new List<int>{ 12 } },
         };
 
         private static readonly IDictionary<Type, object> update = new Dictionary<Type, object>
@@ -167,7 +192,18 @@ namespace Dynamo.ORM.UnitTests
             { typeof(ulong), (ulong)100 },
             { typeof(ulong?), (ulong)100 },
             { typeof(Guid), Guid.NewGuid() },
-            { typeof(Guid?), null }
+            { typeof(Guid?), null },
+            { typeof(string[]), new string[]{ "test", "test2" } },
+            { typeof(IList<string>), new List<string>{ "test", "test2" } },
+            { typeof(IList<Services.ChildModel>), new List<Services.ChildModel>
+                {
+                    new Services.ChildModel{
+                        Property1 = "test 2"
+                    }
+                }
+            },
+            { typeof(int[]), new int[]{ 34 } },
+            { typeof(IList<int>), new List<int>{ 34 } },
         };
     }
 }

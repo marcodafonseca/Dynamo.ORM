@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Dynamo.ORM.Constants
+﻿namespace Dynamo.ORM.Constants
 {
     public static class Formats
     {

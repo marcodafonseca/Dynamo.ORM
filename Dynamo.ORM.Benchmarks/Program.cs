@@ -3,19 +3,17 @@ using Amazon.DynamoDBv2.Model;
 using CsvHelper;
 using Dynamo.ORM.Benchmarks.Models;
 using Dynamo.ORM.Benchmarks.Services;
-using Dynamo.ORM.Services;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Dynamo.ORM.Benchmarks
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var outputPath = "Output";
 
@@ -62,6 +60,7 @@ namespace Dynamo.ORM.Benchmarks
             var results = new List<Result>();
 
             #region Make sure testing table exists
+
             var tables = client.ListTablesAsync().Result;
 
             if (!tables.TableNames.Contains("Benchmarking"))
@@ -70,7 +69,8 @@ namespace Dynamo.ORM.Benchmarks
                 }, new List<AttributeDefinition> {
                     new AttributeDefinition("Id", ScalarAttributeType.N)
                 }, new ProvisionedThroughput(1, 1));
-            #endregion
+
+            #endregion Make sure testing table exists
 
             IBenchmark[] benchmarks = new IBenchmark[] {
                 new AwsSdkBenchmark(client),
@@ -95,8 +95,10 @@ namespace Dynamo.ORM.Benchmarks
                 }
 
             #region Delete testing table
+
             await client.DeleteTableAsync("Benchmarking");
-            #endregion
+
+            #endregion Delete testing table
 
             return results;
         }

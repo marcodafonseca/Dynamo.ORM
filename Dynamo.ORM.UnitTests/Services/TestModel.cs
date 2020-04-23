@@ -1,23 +1,28 @@
 ﻿using Amazon.DynamoDBv2.DataModel;
 using Dynamo.ORM.Models;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Dynamo.ORM.UnitTests.Services
 {
     [DynamoDBTable("TESTS")]
-    class TestModel : Base
+    internal class TestModel : Base
     {
         private DateTime property2;
         private DateTime? property11;
 
         [DynamoDBHashKey]
         public int Id { get; set; }
+
         public string Property1 { get; set; }
+
         [DefaultValue(null)]
         public string EmptyString1 { get; set; }
+
         [DefaultValue("")]
         public string EmptyString2 { get; set; }
+
         public DateTime Property2
         {
             get
@@ -29,6 +34,7 @@ namespace Dynamo.ORM.UnitTests.Services
                 property2 = value;
             }
         }
+
         public int Property3 { get; set; }
         public bool Property4 { get; set; }
         public byte Property5 { get; set; }
@@ -37,6 +43,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public bool? Property8 { get; set; }
         public char Property9 { get; set; }
         public char? Property10 { get; set; }
+
         public DateTime? Property11
         {
             get
@@ -48,6 +55,7 @@ namespace Dynamo.ORM.UnitTests.Services
                 property11 = value;
             }
         }
+
         public decimal Property12 { get; set; }
         public decimal? Property13 { get; set; }
         public double Property14 { get; set; }
@@ -66,5 +74,15 @@ namespace Dynamo.ORM.UnitTests.Services
         public uint? Property27 { get; set; }
         public Guid Property28 { get; set; }
         public Guid? Property29 { get; set; }
+        public string[] Property30 { get; set; }
+        public IList<string> Property31 { get; set; }
+        public IList<ChildModel> Property32 { get; set; }
+        public int[] Property33 { get; set; }
+        public IList<int> Property34 { get; set; }
+    }
+
+    public class ChildModel
+    {
+        public string Property1 { get; set; }
     }
 }

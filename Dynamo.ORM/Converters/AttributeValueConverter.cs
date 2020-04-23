@@ -1,12 +1,16 @@
 ﻿using Amazon.DynamoDBv2.Model;
+using Dynamo.ORM.Constants;
+using Dynamo.ORM.Extensions;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 
-namespace Dynamo.ORM.Constants
+namespace Dynamo.ORM.Converters
 {
-    internal class AttributeValueConverter
+    internal static class AttributeValueConverter
     {
         internal static IDictionary<Type, Func<object, AttributeValue>> ConvertToAttributeValue = new Dictionary<Type, Func<object, AttributeValue>>
         {
@@ -40,7 +44,7 @@ namespace Dynamo.ORM.Constants
             { typeof(ulong?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
             { typeof(object), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.M = ToDictionary(@object)) },
             { typeof(Guid), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
-            { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) }
+            { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
         };
 
         internal static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
@@ -75,29 +79,48 @@ namespace Dynamo.ORM.Constants
             { typeof(ulong?), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => (ulong?)ulong.Parse(attributeValue.N)) },
             { typeof(object), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => attributeValue.M) },
             { typeof(Guid), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => new Guid(attributeValue.S)) },
-            { typeof(Guid?), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => new Guid(attributeValue.S)) }
+            { typeof(Guid?), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => new Guid(attributeValue.S)) },
         };
 
         internal static object FromDictionary(Type type, Dictionary<string, AttributeValue> value)
         {
-            var result = Activator.CreateInstance(type);
+            object result;
+
+            if (type.IsArray)
+                result = type.CreateInstance(value.Count);
+            else
+                result = type.CreateInstance();
 
             var properties = type.GetProperties();
 
-            foreach (var property in properties)
-            {
-                if (property.SetMethod.IsPublic && value.ContainsKey(property.Name))
+            if (value.Count > 0)
+                foreach (var property in properties)
                 {
-                    if (ConvertToValue.ContainsKey(property.PropertyType))
+                    var propertyType = property.PropertyType;
+
+                    if (property.SetMethod.IsPublic && value.ContainsKey(property.Name))
                     {
-                        property.SetValue(result, ConvertToValue[property.PropertyType](value[property.Name]));
-                    }
-                    else if (property.PropertyType.IsClass)
-                    {
-                        property.SetValue(result, FromDictionary(property.PropertyType, value[property.Name].M));
+                        if (ConvertToValue.ContainsKey(propertyType))
+                        {
+                            property.SetValue(result, ConvertToValue[propertyType](value[property.Name]));
+                        }
+                        else if (propertyType.IsArray || (propertyType.IsGenericType && propertyType.GetInterfaces().Contains(typeof(IEnumerable))))
+                        {
+                            var typeArgument = propertyType.GetDeclaringType();
+
+                            if (ListAttributeValueConverter.StringTypes.Contains(typeArgument))
+                                property.SetValue(result, FromList(propertyType, value[property.Name].SS));
+                            else if (ListAttributeValueConverter.AllNumberTypes.Contains(typeArgument))
+                                property.SetValue(result, FromList(propertyType, value[property.Name].NS));
+                            else
+                                property.SetValue(result, FromList(propertyType, value[property.Name].L));
+                        }
+                        else if (propertyType.IsClass)
+                        {
+                            property.SetValue(result, FromDictionary(propertyType, value[property.Name].M));
+                        }
                     }
                 }
-            }
 
             return result;
         }
@@ -110,13 +133,21 @@ namespace Dynamo.ORM.Constants
 
             foreach (var property in properties)
             {
+                var propertyType = property.PropertyType;
+
                 if (property.SetMethod.IsPublic)
                 {
-                    if (ConvertToAttributeValue.ContainsKey(property.PropertyType))
+                    if (ConvertToAttributeValue.ContainsKey(propertyType))
                     {
-                        dictionary.Add(property.Name, ConvertToAttributeValue[property.PropertyType](property.GetValue(@object)));
+                        dictionary.Add(property.Name, ConvertToAttributeValue[propertyType](property.GetValue(@object)));
                     }
-                    else if (property.PropertyType.IsClass)
+                    else if (propertyType.GetInterfaces().Contains(typeof(IEnumerable)))
+                    {
+                        var elementType = propertyType.GetDeclaringType();
+
+                        dictionary.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, ((IEnumerable)property.GetValue(@object)).GetEnumerator()));
+                    }
+                    else if (propertyType.IsClass)
                     {
                         dictionary.Add(property.Name, new AttributeValue { M = ToDictionary(property.GetValue(@object)) });
                     }
@@ -146,6 +177,74 @@ namespace Dynamo.ORM.Constants
             if (!attributeValue.NULL)
                 return nonNullFunction();
             return null;
+        }
+
+        internal static object FromList(Type propertyType, IList<string> values)
+        {
+            var typeArgument = propertyType.GetDeclaringType();
+
+            if (propertyType.IsArray)
+            {
+                var array = propertyType.CreateInstance(values.Count);
+
+                for (var i = 0; i < values.Count; i++)
+                    array.SetValue(ValueConverters.StringConverter[typeArgument](values[i]), i);
+
+                return array;
+            }
+            else if (propertyType.IsGenericType)
+            {
+                IList list = (IList)propertyType.CreateInstance();
+
+                foreach (var value in values)
+                    list.Add(ValueConverters.StringConverter[typeArgument](value));
+
+                return list;
+            }
+
+            return null;
+        }
+
+        internal static object FromList(Type propertyType, IList<AttributeValue> values)
+        {
+            var typeArgument = propertyType.GetDeclaringType();
+
+            if (propertyType.IsArray)
+            {
+                var array = typeArgument.CreateInstance(values.Count);
+
+                for (var i = 0; i < values.Count; i++)
+                    array.SetValue(ConvertToValue[typeArgument](values[i]), i);
+
+                return array;
+            }
+            else if (propertyType.IsGenericType)
+            {
+                IList list = (IList)propertyType.CreateInstance();
+
+                foreach (var value in values)
+                {
+                    var attributeValue = (Dictionary<string, AttributeValue>)ConvertToValue[typeof(object)](value);
+
+                    list.Add(FromDictionary(typeArgument, attributeValue));
+                }
+
+                return list;
+            }
+
+            return null;
+        }
+
+        internal static IList<string> ConvertToArrayValue(Type type, AttributeValue attributeValue)
+        {
+            if (attributeValue.NULL)
+                return null;
+            else if (ListAttributeValueConverter.StringTypes.Contains(type))
+                return attributeValue.SS;
+            else if (ListAttributeValueConverter.AllNumberTypes.Contains(type))
+                return attributeValue.NS;
+            else
+                throw new InvalidCastException("Type not supported: " + type);
         }
     }
 }

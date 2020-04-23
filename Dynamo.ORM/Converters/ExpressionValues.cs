@@ -1,6 +1,4 @@
 ﻿using Amazon.DynamoDBv2.Model;
-using Dynamo.ORM.Constants;
-using Dynamo.ORM.Extensions;
 using Dynamo.ORM.Models;
 using System;
 using System.Collections.Generic;
