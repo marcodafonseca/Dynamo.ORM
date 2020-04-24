@@ -1,4 +1,6 @@
-﻿using Dynamo.ORM.Extensions;
+﻿using Amazon.DynamoDBv2.Model;
+using Dynamo.ORM.Converters;
+using Dynamo.ORM.Extensions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -61,32 +63,78 @@ namespace Dynamo.ORM.UnitTests
         {
             var result = true;
 
-            var type = entity.GetType();
+            var entityType = entity.GetType();
 
-            if (type.IsValueType || type == typeof(string))
+            if (entityType.IsValueType || entityType == typeof(string))
                 return entity.Equals(value);
 
-            var properties = type.GetProperties();
-
-            foreach (var property in properties)
+            if (entityType.GetInterface(typeof(IDictionary<string, AttributeValue>).Name) == null)
             {
-                var entityProperty = property.GetValue(entity);
-                var valueProperty = property.GetValue(value);
+                var properties = entityType.GetProperties();
 
-                if (!string.IsNullOrWhiteSpace($"{entityProperty}{valueProperty}"))
-                    if (property.PropertyType.IsArray ||
-                        (property.PropertyType.IsGenericType && property.PropertyType.GetInterfaces().Contains(typeof(IEnumerable))))
+                foreach (var property in properties)
+                {
+                    var propertyType = property.PropertyType;
+                    var entityPropertyValue = property.GetValue(entity);
+                    var valuePropertyValue = property.GetValue(value);
+
+                    if (string.IsNullOrWhiteSpace($"{entityPropertyValue}{valuePropertyValue}"))
+                        continue;
+
+                    if (propertyType.IsArray ||
+                        (propertyType.IsGenericType && propertyType.GetInterfaces().Contains(typeof(IEnumerable))))
                     {
-                        if (!IsEqualArray(entityProperty as ICollection, valueProperty as ICollection))
+                        if (!IsEqualArray(entityPropertyValue as ICollection, valuePropertyValue as ICollection))
                             result = false;
                     }
-                    else if (!populate.ContainsKey(property.PropertyType))
+                    else if (!populate.ContainsKey(propertyType))
                     {
-                        if (!IsEqual(entityProperty, valueProperty))
+                        if (!IsEqual(entityPropertyValue, valuePropertyValue))
                             result = false;
                     }
-                    else if (!Equals(entityProperty, valueProperty))
+                    else if (propertyType.GetInterface(typeof(IDictionary<string, AttributeValue>).Name) != null)
+                    {
+                        if (!IsEqual(entityPropertyValue as IDictionary<string, AttributeValue>, valuePropertyValue))
+                            result = false;
+                    }
+                    else if (!Equals(entityPropertyValue, valuePropertyValue))
                         result = false;
+                }
+            }
+            else
+            {
+                if (!IsEqual(entity as IDictionary<string, AttributeValue>, value))
+                    result = false;
+            }
+
+            return result;
+        }
+
+        internal static bool IsEqual<T>(this IDictionary<string, AttributeValue> entity, T value) where T : class, new()
+        {
+            var result = true;
+
+            var valueType = value.GetType();
+            var valueProperties = valueType.GetProperties().Select(x => x.Name).ToList();
+            var entityKeys = new List<string>();
+
+            foreach (var key in ((IDictionary)entity).Keys)
+                entityKeys.Add($"{key}");
+
+            if (entityKeys.Except(valueProperties).Any() || valueProperties.Except(entityKeys).Any())
+                result = false;
+            else
+            {
+                foreach (var key in entityKeys)
+                {
+                    var valueProperty = valueType.GetProperty(key);
+
+                    var entityValue = AttributeValueConverter.ConvertToValue[valueProperty.PropertyType](((IDictionary)entity)[key] as AttributeValue);
+                    var valueValue = valueProperty.GetValue(value);
+
+                    if (!IsEqual(entityValue, valueValue))
+                        result = false;
+                }
             }
 
             return result;
@@ -114,6 +162,16 @@ namespace Dynamo.ORM.UnitTests
             }
 
             return result;
+        }
+
+        private static Services.TestModel TestModel
+        {
+            get
+            {
+                var value = new Services.TestModel();
+
+                return value;
+            }
         }
 
         private static readonly IDictionary<Type, object> populate = new Dictionary<Type, object>
@@ -159,6 +217,8 @@ namespace Dynamo.ORM.UnitTests
             },
             { typeof(int[]), new int[]{ 12 } },
             { typeof(IList<int>), new List<int>{ 12 } },
+            { typeof(object), TestModel },
+            { typeof(IList<object>), new List<object>{ TestModel, TestModel } },
         };
 
         private static readonly IDictionary<Type, object> update = new Dictionary<Type, object>
@@ -204,6 +264,8 @@ namespace Dynamo.ORM.UnitTests
             },
             { typeof(int[]), new int[]{ 34 } },
             { typeof(IList<int>), new List<int>{ 34 } },
+            { typeof(object), TestModel },
+            { typeof(IList<object>), new List<object>{ TestModel, TestModel } },
         };
     }
 }

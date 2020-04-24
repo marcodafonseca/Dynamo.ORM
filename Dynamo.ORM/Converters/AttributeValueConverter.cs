@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace Dynamo.ORM.Converters
 {
-    internal static class AttributeValueConverter
+    public static class AttributeValueConverter
     {
         internal static IDictionary<Type, Func<object, AttributeValue>> ConvertToAttributeValue = new Dictionary<Type, Func<object, AttributeValue>>
         {
@@ -47,7 +47,7 @@ namespace Dynamo.ORM.Converters
             { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
         };
 
-        internal static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
+        public static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
         {
             { typeof(bool), (AttributeValue attributeValue) => attributeValue.BOOL },
             { typeof(bool?), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => attributeValue.BOOL) },
@@ -88,12 +88,14 @@ namespace Dynamo.ORM.Converters
 
             if (type.IsArray)
                 result = type.CreateInstance(value.Count);
+            else if (type == typeof(object))
+                result = value;
             else
                 result = type.CreateInstance();
 
             var properties = type.GetProperties();
 
-            if (value.Count > 0)
+            if (value.Count > 0 && properties.Length > 0)
                 foreach (var property in properties)
                 {
                     var propertyType = property.PropertyType;
@@ -145,7 +147,9 @@ namespace Dynamo.ORM.Converters
                     {
                         var elementType = propertyType.GetDeclaringType();
 
-                        dictionary.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, ((IEnumerable)property.GetValue(@object)).GetEnumerator()));
+                        var propertyValue = ((IEnumerable)property.GetValue(@object));
+
+                        dictionary.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, propertyValue?.GetEnumerator()));
                     }
                     else if (propertyType.IsClass)
                     {

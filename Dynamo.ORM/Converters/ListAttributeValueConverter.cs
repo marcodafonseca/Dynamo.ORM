@@ -62,33 +62,36 @@ namespace Dynamo.ORM.Converters
             var stringValues = new List<string>();
             var attributeValues = new List<AttributeValue>();
 
-            if (AllTypes.Contains(type))
-                while (value.MoveNext())
-                    stringValues.Add($"{value.Current}");
-            else if (type.IsClass)
-                while (value.MoveNext())
-                    attributeValues.Add(AttributeValueConverter.ConvertToAttributeValue[typeof(object)](value.Current));
-            else
-                throw new InvalidCastException("Type not supported: " + type.Name);
-
-            if (stringValues.Count > 0)
+            if (value != null)
             {
-                if (StringTypes.Contains(type))
+                if (AllTypes.Contains(type))
+                    while (value.MoveNext())
+                        stringValues.Add($"{value.Current}");
+                else if (type.IsClass)
+                    while (value.MoveNext())
+                        attributeValues.Add(AttributeValueConverter.ConvertToAttributeValue[typeof(object)](value.Current));
+                else
+                    throw new InvalidCastException("Type not supported: " + type.Name);
+
+                if (stringValues.Count > 0)
+                {
+                    if (StringTypes.Contains(type))
+                        return new AttributeValue
+                        {
+                            SS = stringValues
+                        };
+                    else if (AllNumberTypes.Contains(type))
+                        return new AttributeValue
+                        {
+                            NS = stringValues
+                        };
+                }
+                else if (attributeValues.Count > 0)
                     return new AttributeValue
                     {
-                        SS = stringValues
-                    };
-                else if (AllNumberTypes.Contains(type))
-                    return new AttributeValue
-                    {
-                        NS = stringValues
+                        L = attributeValues
                     };
             }
-            else if (attributeValues.Count > 0)
-                return new AttributeValue
-                {
-                    L = attributeValues
-                };
 
             return new AttributeValue
             {

@@ -1,5 +1,6 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using Dynamo.ORM.Models;
 using Dynamo.ORM.Services;
 using System;
 using System.Collections.Generic;
@@ -235,5 +236,32 @@ namespace Dynamo.ORM.UnitTests.Services
             for (int i = 0; i < results.Count; i++)
                 Assert.True(values[i].IsEqual(results[i]));
         }
+
+        [Fact]
+        public async void TestAddEntityWithObjectTypedParameter_ConvertObjectToWorkableDictionary_ExpectSameValue()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestObjectModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entity = await repository.Get<TestObjectModel>(value.Id);
+
+            Assert.True(entity.IsEqual(value));
+        }
+    }
+
+    [Amazon.DynamoDBv2.DataModel.DynamoDBTable("TESTS")]
+    public class TestObjectModel : Base
+    {
+        [Amazon.DynamoDBv2.DataModel.DynamoDBHashKey]
+        public int Id { get; set; }
+
+        public object Property1 { get; set; }
+
+        public IList<object> Property2 { get; set; }
     }
 }
