@@ -1,5 +1,9 @@
 # Release Notes
 
+### Version 0.1.4.5
+
+- Updated dependency version numbers
+
 ### Version 0.1.4.4
 
 - Resolved [Does not supporting saving of IEnumerable](https://github.com/marcodafonseca/Dynamo.ORM/issues/4)

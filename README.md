@@ -78,6 +78,10 @@ await repository.Delete<PersonModel>(1);
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
+### Version 0.1.4.5
+
+- Updated dependency version numbers
+
 ### Version 0.1.4.4
 
 - Added support for null/empty strings
