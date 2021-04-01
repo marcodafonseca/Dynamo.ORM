@@ -35,7 +35,7 @@ namespace Dynamo.ORM.Benchmarks
             var filePath = $"{outputPath}\\results-{DateTime.Now.ToString("yyyy-MM-dd")}.csv";
 
             using (var streamWriter = File.AppendText(filePath))
-            using (var csvHelper = new CsvWriter(streamWriter))
+            using (var csvHelper = new CsvWriter(streamWriter, new System.Globalization.CultureInfo("en-US")))
             {
                 csvHelper.WriteRecords(results);
             }

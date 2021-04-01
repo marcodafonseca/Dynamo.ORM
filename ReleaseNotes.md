@@ -1,5 +1,9 @@
 # Release Notes
 
+### Version 0.1.4.6
+
+- Changed AWSSDK.DynamoDBv2 version reference to 3.*
+
 ### Version 0.1.4.5
 
 - Updated dependency version numbers
