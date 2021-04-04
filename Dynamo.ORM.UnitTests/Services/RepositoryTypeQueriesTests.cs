@@ -30,78 +30,6 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test Repository's "List" function using an Integer property
-        /// </summary>
-        [Fact]
-        public async void TestIntegerQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property3 == value.Property3);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property3, entity.Property3);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using an String property
-        /// </summary>
-        [Fact]
-        public async void TestStringQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property1 == value.Property1);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property1, entity.Property1);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using an DateTimeproperty
-        /// </summary>
-        [Fact]
-        public async void TestDateTimeQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property2 == value.Property2);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property2, entity.Property2);
-        }
-
-        /// <summary>
         /// Test Repository's "List" function using a boolean property
         /// </summary>
         [Fact]
@@ -123,54 +51,6 @@ namespace Dynamo.ORM.UnitTests.Services
 
             foreach (var entity in entities)
                 Assert.Equal(value.Property4, entity.Property4);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a byte property
-        /// </summary>
-        [Fact]
-        public async void TestByteQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property5 == value.Property5);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property5, entity.Property5);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a byte? property
-        /// </summary>
-        [Fact]
-        public async void TestNullableByteQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property6 == value.Property6);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property6, entity.Property6);
         }
 
         /// <summary>
@@ -198,10 +78,10 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test Repository's "List" function using a bool? property
+        /// Test Repository's "List" function using a byte property
         /// </summary>
         [Fact]
-        public async void TestNullableBoolQuery_ExpectItemsReturned()
+        public async void TestByteQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -211,14 +91,14 @@ namespace Dynamo.ORM.UnitTests.Services
 
             await repository.Add(value);
 
-            var entities = await repository.List<TestModel>(x => x.Property8 == value.Property8);
+            var entities = await repository.List<TestModel>(x => x.Property5 == value.Property5);
 
             var size = entities.Count;
 
             Assert.NotEqual(0, size);
 
             foreach (var entity in entities)
-                Assert.Equal(value.Property8, entity.Property8);
+                Assert.Equal(value.Property5, entity.Property5);
         }
 
         /// <summary>
@@ -243,6 +123,198 @@ namespace Dynamo.ORM.UnitTests.Services
 
             foreach (var entity in entities)
                 Assert.Equal(value.Property9, entity.Property9);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using an DateTimeproperty
+        /// </summary>
+        [Fact]
+        public async void TestDateTimeQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property2 == value.Property2);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property2, entity.Property2);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a decimal property
+        /// </summary>
+        [Fact]
+        public async void TestDecimalQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property12 == value.Property12);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property12, entity.Property12);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a double property
+        /// </summary>
+        [Fact]
+        public async void TestDoubleQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property14 == value.Property14);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property14, entity.Property14);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a float property
+        /// </summary>
+        [Fact]
+        public async void TestFloatQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property16 == value.Property16);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property16, entity.Property16);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using an Integer property
+        /// </summary>
+        [Fact]
+        public async void TestIntegerQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property3 == value.Property3);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property3, entity.Property3);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a long property
+        /// </summary>
+        [Fact]
+        public async void TestLongQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property20 == value.Property20);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property20, entity.Property20);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a bool? property
+        /// </summary>
+        [Fact]
+        public async void TestNullableBoolQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property8 == value.Property8);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property8, entity.Property8);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a byte? property
+        /// </summary>
+        [Fact]
+        public async void TestNullableByteQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property6 == value.Property6);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property6, entity.Property6);
         }
 
         /// <summary>
@@ -294,30 +366,6 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test Repository's "List" function using a decimal property
-        /// </summary>
-        [Fact]
-        public async void TestDecimalQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property12 == value.Property12);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property12, entity.Property12);
-        }
-
-        /// <summary>
         /// Test Repository's "List" function using a decimal? property
         /// </summary>
         [Fact]
@@ -339,30 +387,6 @@ namespace Dynamo.ORM.UnitTests.Services
 
             foreach (var entity in entities)
                 Assert.Equal(value.Property13, entity.Property13);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a double property
-        /// </summary>
-        [Fact]
-        public async void TestDoubleQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property14 == value.Property14);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property14, entity.Property14);
         }
 
         /// <summary>
@@ -390,30 +414,6 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test Repository's "List" function using a float property
-        /// </summary>
-        [Fact]
-        public async void TestFloatQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property16 == value.Property16);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property16, entity.Property16);
-        }
-
-        /// <summary>
         /// Test Repository's "List" function using a float? property
         /// </summary>
         [Fact]
@@ -435,78 +435,6 @@ namespace Dynamo.ORM.UnitTests.Services
 
             foreach (var entity in entities)
                 Assert.Equal(value.Property15, entity.Property15);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a short property
-        /// </summary>
-        [Fact]
-        public async void TestShortQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property18 == value.Property18);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property18, entity.Property18);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a short? property
-        /// </summary>
-        [Fact]
-        public async void TestNullableShortQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property19 == value.Property19);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property19, entity.Property19);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a long property
-        /// </summary>
-        [Fact]
-        public async void TestLongQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property20 == value.Property20);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property20, entity.Property20);
         }
 
         /// <summary>
@@ -534,10 +462,10 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test Repository's "List" function using a ushort property
+        /// Test Repository's "List" function using a short? property
         /// </summary>
         [Fact]
-        public async void TestUShortQuery_ExpectItemsReturned()
+        public async void TestNullableShortQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -547,110 +475,14 @@ namespace Dynamo.ORM.UnitTests.Services
 
             await repository.Add(value);
 
-            var entities = await repository.List<TestModel>(x => x.Property22 == value.Property22);
+            var entities = await repository.List<TestModel>(x => x.Property19 == value.Property19);
 
             var size = entities.Count;
 
             Assert.NotEqual(0, size);
 
             foreach (var entity in entities)
-                Assert.Equal(value.Property22, entity.Property22);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a ushort? property
-        /// </summary>
-        [Fact]
-        public async void TestNullableUShortQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property23 == value.Property23);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property23, entity.Property23);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a ulong property
-        /// </summary>
-        [Fact]
-        public async void TestULongQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property24 == value.Property24);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property24, entity.Property24);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a ulong? property
-        /// </summary>
-        [Fact]
-        public async void TestNullableULongQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property25 == value.Property25);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property25, entity.Property25);
-        }
-
-        /// <summary>
-        /// Test Repository's "List" function using a uint property
-        /// </summary>
-        [Fact]
-        public async void TestUIntQuery_ExpectItemsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entities = await repository.List<TestModel>(x => x.Property26 == value.Property26);
-
-            var size = entities.Count;
-
-            Assert.NotEqual(0, size);
-
-            foreach (var entity in entities)
-                Assert.Equal(value.Property26, entity.Property26);
+                Assert.Equal(value.Property19, entity.Property19);
         }
 
         /// <summary>
@@ -678,6 +510,54 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
+        /// Test Repository's "List" function using a ulong? property
+        /// </summary>
+        [Fact]
+        public async void TestNullableULongQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property25 == value.Property25);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property25, entity.Property25);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a ushort? property
+        /// </summary>
+        [Fact]
+        public async void TestNullableUShortQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property23 == value.Property23);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property23, entity.Property23);
+        }
+
+        /// <summary>
         /// Test filtering by a nullable field
         /// </summary>
         [Fact]
@@ -699,6 +579,126 @@ namespace Dynamo.ORM.UnitTests.Services
 
             foreach (var entity in entities)
                 Assert.Null(entity.Property6);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a short property
+        /// </summary>
+        [Fact]
+        public async void TestShortQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property18 == value.Property18);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property18, entity.Property18);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using an String property
+        /// </summary>
+        [Fact]
+        public async void TestStringQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property1 == value.Property1);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property1, entity.Property1);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a uint property
+        /// </summary>
+        [Fact]
+        public async void TestUIntQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property26 == value.Property26);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property26, entity.Property26);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a ulong property
+        /// </summary>
+        [Fact]
+        public async void TestULongQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property24 == value.Property24);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property24, entity.Property24);
+        }
+
+        /// <summary>
+        /// Test Repository's "List" function using a ushort property
+        /// </summary>
+        [Fact]
+        public async void TestUShortQuery_ExpectItemsReturned()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            await repository.Add(value);
+
+            var entities = await repository.List<TestModel>(x => x.Property22 == value.Property22);
+
+            var size = entities.Count;
+
+            Assert.NotEqual(0, size);
+
+            foreach (var entity in entities)
+                Assert.Equal(value.Property22, entity.Property22);
         }
     }
 }

@@ -8,29 +8,16 @@ namespace Dynamo.ORM.Converters
 {
     internal static class ListAttributeValueConverter
     {
-        public static Type[] AllTypes
-        {
-            get
-            {
-                return StringTypes
-                    .Concat(NumberTypes)
-                    .Concat(NullableNumberTypes)
-                    .ToArray();
-            }
-        }
-
-        public static Type[] AllNumberTypes
-        {
-            get
-            {
-                return NumberTypes
-                    .Concat(NullableNumberTypes)
-                    .ToArray();
-            }
-        }
-
-        public static Type[] StringTypes = {
-            typeof(string)
+        public static Type[] NullableNumberTypes = {
+            typeof(decimal?),
+            typeof(double?),
+            typeof(float?),
+            typeof(short?),
+            typeof(int?),
+            typeof(long?),
+            typeof(ushort?),
+            typeof(uint?),
+            typeof(ulong?),
         };
 
         public static Type[] NumberTypes = {
@@ -45,17 +32,30 @@ namespace Dynamo.ORM.Converters
             typeof(ulong),
         };
 
-        public static Type[] NullableNumberTypes = {
-            typeof(decimal?),
-            typeof(double?),
-            typeof(float?),
-            typeof(short?),
-            typeof(int?),
-            typeof(long?),
-            typeof(ushort?),
-            typeof(uint?),
-            typeof(ulong?),
+        public static Type[] StringTypes = {
+            typeof(string)
         };
+
+        public static Type[] AllNumberTypes
+        {
+            get
+            {
+                return NumberTypes
+                    .Concat(NullableNumberTypes)
+                    .ToArray();
+            }
+        }
+
+        public static Type[] AllTypes
+        {
+            get
+            {
+                return StringTypes
+                    .Concat(NumberTypes)
+                    .Concat(NullableNumberTypes)
+                    .ToArray();
+            }
+        }
 
         internal static AttributeValue ConvertToAttributeValue(Type type, IEnumerator value)
         {

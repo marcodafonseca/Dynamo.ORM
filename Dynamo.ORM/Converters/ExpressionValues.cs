@@ -25,6 +25,15 @@ namespace Dynamo.ORM.Converters
             return result.ToDictionary(s => s.Key, s => s.Value);
         }
 
+        private static void AppedExpressionValue(BinaryExpression binaryExpression, Expression propertyExpression, Expression valueExpression, string variableName, ref IEnumerable<KeyValuePair<string, object>> expressionValues, ref StringBuilder expressionString)
+        {
+            var propertyName = GetPropertyReference(propertyExpression);
+
+            expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(valueExpression)));
+
+            expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
+        }
+
         private static IDictionary<string, AttributeValue> ConvertExpressionValues(BinaryExpression binaryExpression, ref int valueIndex, ref StringBuilder expressionString)
         {
             var expressionValues = GetExpressionValues(binaryExpression, ref valueIndex, ref expressionString);
@@ -102,15 +111,6 @@ namespace Dynamo.ORM.Converters
             return expressionValues;
         }
 
-        private static void AppedExpressionValue(BinaryExpression binaryExpression, Expression propertyExpression, Expression valueExpression, string variableName, ref IEnumerable<KeyValuePair<string, object>> expressionValues, ref StringBuilder expressionString)
-        {
-            var propertyName = GetPropertyReference(propertyExpression);
-
-            expressionValues = expressionValues.Append(new KeyValuePair<string, object>(variableName, GetValue(valueExpression)));
-
-            expressionString.Replace(binaryExpression.ToString(), $"{propertyName} {binaryExpression.NodeType} {variableName}");
-        }
-
         private static string GetPropertyReference(Expression expression) => Base.GetPropertyReference(expression.ToString());
 
         // Needs revising for a more generic approach
@@ -120,16 +120,6 @@ namespace Dynamo.ORM.Converters
                 return Constants.ExpressionValues.GetExpressionValues[expression.Type](expression);
             else
                 return Constants.ExpressionValues.GetExpressionValues[typeof(object)](expression);
-        }
-
-        private static bool IsMemberNode(Expression expression)
-        {
-            if (expression.NodeType != ExpressionType.MemberAccess)
-                return false;
-            if (expression is MemberExpression)
-                if (!(((MemberExpression)expression).Expression is ParameterExpression))
-                    return false;
-            return true;
         }
 
         private static bool IsExpressionNodeType(ExpressionType nodeType)
@@ -142,6 +132,22 @@ namespace Dynamo.ORM.Converters
             return false;
         }
 
+        private static bool IsMemberNode(Expression expression)
+        {
+            if (expression.NodeType != ExpressionType.MemberAccess)
+                return false;
+            if (expression is MemberExpression)
+                if (!(((MemberExpression)expression).Expression is ParameterExpression))
+                    return false;
+            return true;
+        }
+
+        private static void SanitizeComparitives(ref StringBuilder expressionString)
+        {
+            foreach (var comparitive in Constants.ExpressionValues.Comparitives)
+                expressionString.Replace(comparitive.Key, comparitive.Value);
+        }
+
         private static void SanitizeExpression<T>(Expression<Func<T, bool>> expression, ref StringBuilder expressionString) where T : Base, new()
         {
             foreach (var parameter in expression.Parameters)
@@ -149,12 +155,6 @@ namespace Dynamo.ORM.Converters
 
             foreach (Match match in Regex.Matches(expressionString.ToString(), @"(#\w+)+"))
                 expressionString.Replace(match.Value, Base.GetPropertyReference(match.Value.Substring(1)));
-        }
-
-        private static void SanitizeComparitives(ref StringBuilder expressionString)
-        {
-            foreach (var comparitive in Constants.ExpressionValues.Comparitives)
-                expressionString.Replace(comparitive.Key, comparitive.Value);
         }
     }
 }

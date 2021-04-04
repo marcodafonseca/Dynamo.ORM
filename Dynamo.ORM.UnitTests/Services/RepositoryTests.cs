@@ -1,6 +1,5 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
-using Dynamo.ORM.Models;
 using Dynamo.ORM.Services;
 using System;
 using System.Collections.Generic;
@@ -57,6 +56,35 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Make sure item is no longer in the database
         /// </summary>
         [Fact]
+        public async void TestDeleteByPartitionKey_ExpectNoItemInTable()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel();
+
+            value.PopulateProperties();
+
+            // Just added this line so other tests don't interfere with it when running them all together
+            value.Id = 3001;
+
+            await repository.Add(value);
+
+            var entity1 = await repository.Get<TestModel>(value.Id);
+
+            await repository.Delete<TestModel>(value.Id);
+
+            var entity2 = await repository.Get<TestModel>(value.Id);
+
+            Assert.NotNull(entity1);
+            Assert.True(entity1.IsEqual(value));
+            Assert.Null(entity2);
+        }
+
+        /// <summary>
+        /// Test repository's "Delete" function
+        /// Make sure item is no longer in the database
+        /// </summary>
+        [Fact]
         public async void TestDeleteEntity_ExpectNoItemInTable()
         {
             var repository = new Repository(client);
@@ -82,32 +110,24 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test repository's "Delete" function
-        /// Make sure item is no longer in the database
+        /// Test repository's "Get" function by way of a member expression
         /// </summary>
         [Fact]
-        public async void TestDeleteByPartitionKey_ExpectNoItemInTable()
+        public async void TestGetByComplexExpression_ExpectSameValuesReturned()
         {
             var repository = new Repository(client);
 
             var value = new TestModel();
+            var dateFilter = new DateTime(2018, 11, 16).ToUniversalTime();
 
             value.PopulateProperties();
 
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3001;
-
             await repository.Add(value);
 
-            var entity1 = await repository.Get<TestModel>(value.Id);
-
-            await repository.Delete<TestModel>(value.Id);
-
-            var entity2 = await repository.Get<TestModel>(value.Id);
+            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
-            Assert.Null(entity2);
         }
 
         /// <summary>
@@ -151,58 +171,6 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test repository's "Get" function by way of a member expression
-        /// </summary>
-        [Fact]
-        public async void TestGetByComplexExpression_ExpectSameValuesReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-            var dateFilter = new DateTime(2018, 11, 16).ToUniversalTime();
-
-            value.PopulateProperties();
-
-            await repository.Add(value);
-
-            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100);
-
-            Assert.NotNull(entity1);
-            Assert.True(entity1.IsEqual(value));
-        }
-
-        /// <summary>
-        /// Test repository's "Update" function
-        /// Expect item added, updated and returned
-        /// </summary>
-        [Fact]
-        public async void TestUpdateEntity_ExpectUpdatedResultsReturned()
-        {
-            var repository = new Repository(client);
-
-            var value = new TestModel();
-
-            value.PopulateProperties();
-
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3003;
-
-            await repository.Add(value);
-
-            var entity1 = await repository.Get<TestModel>(value.Id);
-
-            value.UpdateProperties();
-
-            await repository.Update(value);
-
-            var entity2 = await repository.Get<TestModel>(value.Id);
-
-            Assert.False(entity1.IsEqual(value));
-            Assert.False(entity1.IsEqual(entity2));
-            Assert.True(entity2.IsEqual(value));
-        }
-
-        /// <summary>
         /// Test repository's "List" function
         /// Expect same results returned
         /// </summary>
@@ -237,31 +205,35 @@ namespace Dynamo.ORM.UnitTests.Services
                 Assert.True(values[i].IsEqual(results[i]));
         }
 
+        /// <summary>
+        /// Test repository's "Update" function
+        /// Expect item added, updated and returned
+        /// </summary>
         [Fact]
-        public async void TestAddEntityWithObjectTypedParameter_ConvertObjectToWorkableDictionary_ExpectSameValue()
+        public async void TestUpdateEntity_ExpectUpdatedResultsReturned()
         {
             var repository = new Repository(client);
 
-            var value = new TestObjectModel();
+            var value = new TestModel();
 
             value.PopulateProperties();
 
+            // Just added this line so other tests don't interfere with it when running them all together
+            value.Id = 3003;
+
             await repository.Add(value);
 
-            var entity = await repository.Get<TestObjectModel>(value.Id);
+            var entity1 = await repository.Get<TestModel>(value.Id);
 
-            Assert.True(entity.IsEqual(value));
+            value.UpdateProperties();
+
+            await repository.Update(value);
+
+            var entity2 = await repository.Get<TestModel>(value.Id);
+
+            Assert.False(entity1.IsEqual(value));
+            Assert.False(entity1.IsEqual(entity2));
+            Assert.True(entity2.IsEqual(value));
         }
-    }
-
-    [Amazon.DynamoDBv2.DataModel.DynamoDBTable("TESTS")]
-    public class TestObjectModel : Base
-    {
-        [Amazon.DynamoDBv2.DataModel.DynamoDBHashKey]
-        public int Id { get; set; }
-
-        public object Property1 { get; set; }
-
-        public IList<object> Property2 { get; set; }
     }
 }

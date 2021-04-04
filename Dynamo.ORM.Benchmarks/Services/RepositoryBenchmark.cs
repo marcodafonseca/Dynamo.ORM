@@ -8,8 +8,8 @@ namespace Dynamo.ORM.Benchmarks.Services
 {
     internal class RepositoryBenchmark : IBenchmark
     {
-        private readonly string repositoryName = "RepositoryBenchmark";
         private readonly Repository repository;
+        private readonly string repositoryName = "RepositoryBenchmark";
 
         public RepositoryBenchmark(IAmazonDynamoDB amazonDynamo)
         {

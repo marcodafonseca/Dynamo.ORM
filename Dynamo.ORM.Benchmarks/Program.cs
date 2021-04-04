@@ -61,7 +61,7 @@ namespace Dynamo.ORM.Benchmarks
 
             #region Make sure testing table exists
 
-            var tables = client.ListTablesAsync().Result;
+            var tables = await client.ListTablesAsync();
 
             if (!tables.TableNames.Contains("Benchmarking"))
                 await client.CreateTableAsync("Benchmarking", new List<KeySchemaElement> {

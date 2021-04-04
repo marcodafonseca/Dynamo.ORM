@@ -12,41 +12,6 @@ namespace Dynamo.ORM.Converters
 {
     public static class AttributeValueConverter
     {
-        internal static IDictionary<Type, Func<object, AttributeValue>> ConvertToAttributeValue = new Dictionary<Type, Func<object, AttributeValue>>
-        {
-            { typeof(bool), (object @object) => new AttributeValue { BOOL = bool.Parse($"{@object}")} },
-            { typeof(bool?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.BOOL = bool.Parse($"{@object}")) },
-            { typeof(byte), (object @object) => new AttributeValue { N = $"{@object}" } },
-            { typeof(byte?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(byte[]), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.B = new MemoryStream((byte[])@object), () => @object != null && ((byte[])@object).Length > 0) },
-            { typeof(char), (object @object) => new AttributeValue{N = "" + Convert.ToInt32(@object) } },
-            { typeof(char?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = "" + Convert.ToInt32(@object)) },
-            { typeof(DateTime), (object @object) => new AttributeValue { S = ((DateTime)@object).ToString(Formats.DateFormat) } },
-            { typeof(DateTime?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = ((DateTime)@object).ToString(Formats.DateFormat)) },
-            { typeof(decimal), (object @object) => new AttributeValue{ N = $"{@object}" } },
-            { typeof(decimal?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(double), (object @object) => new AttributeValue{ N = $"{@object}" } },
-            { typeof(double?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(float), (object @object) => new AttributeValue{ N = $"{@object}" } },
-            { typeof(float?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(short), (object @object) => new AttributeValue{ N = $"{@object}" } },
-            { typeof(short?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(int), (object @object) => new AttributeValue { N = $"{@object}" } },
-            { typeof(int?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(long), (object @object) => new AttributeValue { N = $"{@object}" } },
-            { typeof(long?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(string), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = $"{@object}", () => !string.IsNullOrWhiteSpace($"{@object}")) },
-            { typeof(ushort), (object @object) => new AttributeValue{ N = $"{@object}" } },
-            { typeof(ushort?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(uint), (object @object) => new AttributeValue { N = $"{@object}" } },
-            { typeof(uint?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(ulong), (object @object) => new AttributeValue { N = $"{@object}" } },
-            { typeof(ulong?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
-            { typeof(object), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.M = ToDictionary(@object)) },
-            { typeof(Guid), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
-            { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
-        };
-
         public static IDictionary<Type, Func<AttributeValue, object>> ConvertToValue = new Dictionary<Type, Func<AttributeValue, object>>
         {
             { typeof(bool), (AttributeValue attributeValue) => attributeValue.BOOL },
@@ -82,6 +47,106 @@ namespace Dynamo.ORM.Converters
             { typeof(Guid?), (AttributeValue attributeValue) => GetNullableValue(attributeValue, () => new Guid(attributeValue.S)) },
         };
 
+        internal static IDictionary<Type, Func<object, AttributeValue>> ConvertToAttributeValue = new Dictionary<Type, Func<object, AttributeValue>>
+        {
+            { typeof(bool), (object @object) => new AttributeValue { BOOL = bool.Parse($"{@object}")} },
+            { typeof(bool?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.BOOL = bool.Parse($"{@object}")) },
+            { typeof(byte), (object @object) => new AttributeValue { N = $"{@object}" } },
+            { typeof(byte?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(byte[]), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.B = new MemoryStream((byte[])@object), () => @object != null && ((byte[])@object).Length > 0) },
+            { typeof(char), (object @object) => new AttributeValue{N = "" + Convert.ToInt32(@object) } },
+            { typeof(char?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = "" + Convert.ToInt32(@object)) },
+            { typeof(DateTime), (object @object) => new AttributeValue { S = ((DateTime)@object).ToString(Formats.DateFormat) } },
+            { typeof(DateTime?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = ((DateTime)@object).ToString(Formats.DateFormat)) },
+            { typeof(decimal), (object @object) => new AttributeValue{ N = $"{@object}" } },
+            { typeof(decimal?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(double), (object @object) => new AttributeValue{ N = $"{@object}" } },
+            { typeof(double?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(float), (object @object) => new AttributeValue{ N = $"{@object}" } },
+            { typeof(float?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(short), (object @object) => new AttributeValue{ N = $"{@object}" } },
+            { typeof(short?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(int), (object @object) => new AttributeValue { N = $"{@object}" } },
+            { typeof(int?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(long), (object @object) => new AttributeValue { N = $"{@object}" } },
+            { typeof(long?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(string), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = $"{@object}", () => !string.IsNullOrWhiteSpace($"{@object}")) },
+            { typeof(ushort), (object @object) => new AttributeValue{ N = $"{@object}" } },
+            { typeof(ushort?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(uint), (object @object) => new AttributeValue { N = $"{@object}" } },
+            { typeof(uint?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(ulong), (object @object) => new AttributeValue { N = $"{@object}" } },
+            { typeof(ulong?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.N = $"{@object}") },
+            { typeof(object), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.M = ToDictionary(@object)) },
+            { typeof(Guid), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
+            { typeof(Guid?), (object @object) => GetNullableAttributeValue(@object, (AttributeValue attributeValue) => attributeValue.S = @object.ToString()) },
+        };
+
+        public static object ConvertAttributeValue(AttributeValue value)
+        {
+            if (value.B != null)
+                return ConvertToValue[typeof(byte[])](value);
+            else if (value.IsBOOLSet)
+                return ConvertToValue[typeof(bool)](value);
+            else if (value.IsLSet)
+            {
+                var list = new List<object>();
+
+                foreach (var item in value.L)
+                    list.Add(ConvertAttributeValue(item));
+
+                return list;
+            }
+            else if (value.IsMSet)
+                return CreateDictionaryObject(value.M);
+            else if (!string.IsNullOrWhiteSpace(value.N))
+                return ConvertToValue[typeof(int)](value);
+            else if (value.NS.Count > 0)
+            {
+                var list = new List<long>();
+
+                foreach (var item in value.NS)
+                    list.Add(long.Parse(item));
+
+                return list;
+            }
+            else if (!string.IsNullOrWhiteSpace(value.S))
+                return value.S;
+            else if (value.SS.Count > 0)
+            {
+                var list = new List<string>();
+
+                foreach (var item in value.SS)
+                    list.Add(item);
+
+                return list;
+            }
+
+            return null;
+        }
+
+        internal static IList<string> ConvertToArrayValue(Type type, AttributeValue attributeValue)
+        {
+            if (attributeValue.NULL)
+                return null;
+            else if (ListAttributeValueConverter.StringTypes.Contains(type))
+                return attributeValue.SS;
+            else if (ListAttributeValueConverter.AllNumberTypes.Contains(type))
+                return attributeValue.NS;
+            else
+                throw new InvalidCastException("Type not supported: " + type);
+        }
+
+        internal static object ConvertToDictionary(Type propertyType, Dictionary<string, AttributeValue> propertyValues)
+        {
+            var dictionary = (IDictionary)BaseExtensions.CreateInstance(propertyType);
+
+            foreach (var propertyValue in propertyValues)
+                dictionary.Add(propertyValue.Key, ConvertAttributeValue(propertyValue.Value));
+
+            return dictionary;
+        }
+
         internal static object FromDictionary(Type type, Dictionary<string, AttributeValue> value)
         {
             object result;
@@ -89,7 +154,7 @@ namespace Dynamo.ORM.Converters
             if (type.IsArray)
                 result = type.CreateInstance(value.Count);
             else if (type == typeof(object))
-                result = value;
+                result = CreateDictionaryObject(value);
             else
                 result = type.CreateInstance();
 
@@ -127,62 +192,6 @@ namespace Dynamo.ORM.Converters
             return result;
         }
 
-        internal static Dictionary<string, AttributeValue> ToDictionary(object @object)
-        {
-            var type = @object.GetType();
-            var properties = type.GetProperties();
-            var dictionary = new Dictionary<string, AttributeValue>();
-
-            foreach (var property in properties)
-            {
-                var propertyType = property.PropertyType;
-
-                if (property.SetMethod.IsPublic)
-                {
-                    if (ConvertToAttributeValue.ContainsKey(propertyType))
-                    {
-                        dictionary.Add(property.Name, ConvertToAttributeValue[propertyType](property.GetValue(@object)));
-                    }
-                    else if (propertyType.GetInterfaces().Contains(typeof(IEnumerable)))
-                    {
-                        var elementType = propertyType.GetDeclaringType();
-
-                        var propertyValue = ((IEnumerable)property.GetValue(@object));
-
-                        dictionary.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, propertyValue?.GetEnumerator()));
-                    }
-                    else if (propertyType.IsClass)
-                    {
-                        dictionary.Add(property.Name, new AttributeValue { M = ToDictionary(property.GetValue(@object)) });
-                    }
-                }
-            }
-
-            return dictionary;
-        }
-
-        private static AttributeValue GetNullableAttributeValue(object @object, Func<AttributeValue, object> nonNullFunction, Func<bool> validator = null)
-        {
-            var attributeValue = new AttributeValue();
-
-            if (validator == null)
-                validator = () => @object != null;
-
-            if (validator())
-                nonNullFunction(attributeValue);
-            else
-                attributeValue.NULL = true;
-
-            return attributeValue;
-        }
-
-        private static object GetNullableValue(AttributeValue attributeValue, Func<object> nonNullFunction)
-        {
-            if (!attributeValue.NULL)
-                return nonNullFunction();
-            return null;
-        }
-
         internal static object FromList(Type propertyType, IList<string> values)
         {
             var typeArgument = propertyType.GetDeclaringType();
@@ -198,7 +207,7 @@ namespace Dynamo.ORM.Converters
             }
             else if (propertyType.IsGenericType)
             {
-                IList list = (IList)propertyType.CreateInstance();
+                var list = (IList)propertyType.CreateInstance();
 
                 foreach (var value in values)
                     list.Add(ValueConverters.StringConverter[typeArgument](value));
@@ -239,16 +248,70 @@ namespace Dynamo.ORM.Converters
             return null;
         }
 
-        internal static IList<string> ConvertToArrayValue(Type type, AttributeValue attributeValue)
+        internal static Dictionary<string, AttributeValue> ToDictionary(object @object)
         {
-            if (attributeValue.NULL)
-                return null;
-            else if (ListAttributeValueConverter.StringTypes.Contains(type))
-                return attributeValue.SS;
-            else if (ListAttributeValueConverter.AllNumberTypes.Contains(type))
-                return attributeValue.NS;
+            var type = @object.GetType();
+            var properties = type.GetProperties();
+            var dictionary = new Dictionary<string, AttributeValue>();
+
+            foreach (var property in properties)
+            {
+                var propertyType = property.PropertyType;
+
+                if (property.SetMethod?.IsPublic == true)
+                {
+                    if (ConvertToAttributeValue.ContainsKey(propertyType))
+                    {
+                        dictionary.Add(property.Name, ConvertToAttributeValue[propertyType](property.GetValue(@object)));
+                    }
+                    else if (propertyType.GetInterfaces().Contains(typeof(IEnumerable)))
+                    {
+                        var elementType = propertyType.GetDeclaringType();
+
+                        var propertyValue = ((IEnumerable)property.GetValue(@object));
+
+                        dictionary.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, propertyValue?.GetEnumerator()));
+                    }
+                    else if (propertyType.IsClass)
+                    {
+                        dictionary.Add(property.Name, new AttributeValue { M = ToDictionary(property.GetValue(@object)) });
+                    }
+                }
+            }
+
+            return dictionary;
+        }
+
+        private static object CreateDictionaryObject(Dictionary<string, AttributeValue> values)
+        {
+            var dictionary = new Dictionary<string, object>();
+
+            foreach (var value in values)
+                dictionary.Add(value.Key, ConvertAttributeValue(value.Value));
+
+            return dictionary;
+        }
+
+        private static AttributeValue GetNullableAttributeValue(object @object, Func<AttributeValue, object> nonNullFunction, Func<bool> validator = null)
+        {
+            var attributeValue = new AttributeValue();
+
+            if (validator == null)
+                validator = () => @object != null;
+
+            if (validator())
+                nonNullFunction(attributeValue);
             else
-                throw new InvalidCastException("Type not supported: " + type);
+                attributeValue.NULL = true;
+
+            return attributeValue;
+        }
+
+        private static object GetNullableValue(AttributeValue attributeValue, Func<object> nonNullFunction)
+        {
+            if (!attributeValue.NULL)
+                return nonNullFunction();
+            return null;
         }
     }
 }

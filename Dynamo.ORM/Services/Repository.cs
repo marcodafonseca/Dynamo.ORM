@@ -40,6 +40,22 @@ namespace Dynamo.ORM.Services
                 });
         }
 
+        public void BeginWriteTransaction()
+        {
+            writeActions = new List<TransactWriteItem>();
+        }
+
+        public async Task CommitWriteTransaction()
+        {
+            var request = new TransactWriteItemsRequest
+            {
+                TransactItems = writeActions,
+                ReturnConsumedCapacity = ReturnConsumedCapacity.TOTAL
+            };
+
+            var response = await amazonDynamoDB.TransactWriteItemsAsync(request);
+        }
+
         public async Task Delete<T>(T entity) where T : Base, new()
         {
             var request = new DeleteItemRequest
@@ -161,6 +177,11 @@ namespace Dynamo.ORM.Services
                 .ToList();
         }
 
+        public void RollbackWriteTransaction()
+        {
+            writeActions = null;
+        }
+
         public async Task Update<T>(T entity) where T : Base, new()
         {
             var request = new UpdateItemRequest
@@ -180,27 +201,6 @@ namespace Dynamo.ORM.Services
                 {
                     Update = request.Map()
                 });
-        }
-
-        public void BeginWriteTransaction()
-        {
-            writeActions = new List<TransactWriteItem>();
-        }
-
-        public async Task CommitWriteTransaction()
-        {
-            var request = new TransactWriteItemsRequest
-            {
-                TransactItems = writeActions,
-                ReturnConsumedCapacity = ReturnConsumedCapacity.TOTAL
-            };
-
-            var response = await amazonDynamoDB.TransactWriteItemsAsync(request);
-        }
-
-        public void RollbackWriteTransaction()
-        {
-            writeActions = null;
         }
     }
 }

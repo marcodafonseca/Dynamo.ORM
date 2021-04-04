@@ -31,10 +31,10 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test filtering with the ToUpper function
+        /// Test filtering with a newly instantiated array while calling the max value
         /// </summary>
         [Fact]
-        public async void TestToUpperQueryOnStringParameter_ExpectResults()
+        public async void TestMaxQueryOnIntParameter_ExpectResults()
         {
             var repository = new Repository(client);
 
@@ -42,9 +42,11 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
+            value.Property3 = 400;
+
             await repository.Add(value);
 
-            var entities = await repository.List<TestModel>(x => x.Property1 == "test".ToUpper());
+            var entities = await repository.List<TestModel>(x => x.Property3 == new int[] { 1, 400, 3 }.Max());
 
             var size = entities.Count;
 
@@ -82,10 +84,10 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
-        /// Test filtering with a newly instantiated array while calling the max value
+        /// Test filtering with the ToUpper function
         /// </summary>
         [Fact]
-        public async void TestMaxQueryOnIntParameter_ExpectResults()
+        public async void TestToUpperQueryOnStringParameter_ExpectResults()
         {
             var repository = new Repository(client);
 
@@ -93,11 +95,9 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            value.Property3 = 400;
-
             await repository.Add(value);
 
-            var entities = await repository.List<TestModel>(x => x.Property3 == new int[] { 1, 400, 3 }.Max());
+            var entities = await repository.List<TestModel>(x => x.Property1 == "test".ToUpper());
 
             var size = entities.Count;
 

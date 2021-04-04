@@ -9,8 +9,8 @@ namespace Dynamo.ORM.Benchmarks.Services
 {
     public class AwsSdkBenchmark : IBenchmark
     {
-        private readonly string repositoryName = "AwsSdkBenchmark";
         private readonly IAmazonDynamoDB amazonDynamoDB;
+        private readonly string repositoryName = "AwsSdkBenchmark";
 
         public AwsSdkBenchmark(IAmazonDynamoDB amazonDynamoDB)
         {

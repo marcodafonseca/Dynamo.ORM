@@ -11,15 +11,37 @@ namespace Dynamo.ORM.UnitTests.Extensions
     public class BaseExtensionsTests
     {
         /// <summary>
-        /// Test that table name is returned when DynamoDBTable is assigned
+        /// Test that dictionary is populated with ExpressionAttributes based on class setup
+        /// private property is to be ignored
         /// </summary>
         [Fact]
-        public void TestGetTableName_ExpectTestTableName()
+        public void TestExpressionAttributes_ExpectDictionary()
         {
             var entity = new MockTable();
-            var tableName = entity.GetTableName();
 
-            Assert.Equal("TestTableName", tableName);
+            var dictionary = entity.GetExpressionAttributes();
+
+            Assert.Equal(3, dictionary.Count);
+            Assert.True(dictionary.ContainsKey("#id"));
+            Assert.True(dictionary.ContainsKey("#property1"));
+            Assert.True(dictionary.ContainsKey("#property2"));
+            Assert.False(dictionary.ContainsKey("#property3"));
+        }
+
+        /// <summary>
+        /// Populates test data from an extension and then compares the returned key against the populated data
+        /// </summary>
+        [Fact]
+        public void TestGetKey_ExpectKeyDictionary()
+        {
+            var entity = new MockTable();
+
+            entity.PopulateProperties();
+
+            var keyDictionary = entity.GetKey();
+
+            Assert.True(keyDictionary.Count == 1);
+            Assert.Equal(entity.Id, int.Parse(keyDictionary["Id"].N));
         }
 
         /// <summary>
@@ -44,21 +66,15 @@ namespace Dynamo.ORM.UnitTests.Extensions
         }
 
         /// <summary>
-        /// Test that dictionary is populated with ExpressionAttributes based on class setup
-        /// private property is to be ignored
+        /// Test that table name is returned when DynamoDBTable is assigned
         /// </summary>
         [Fact]
-        public void TestExpressionAttributes_ExpectDictionary()
+        public void TestGetTableName_ExpectTestTableName()
         {
             var entity = new MockTable();
+            var tableName = entity.GetTableName();
 
-            var dictionary = entity.GetExpressionAttributes();
-
-            Assert.Equal(3, dictionary.Count);
-            Assert.True(dictionary.ContainsKey("#id"));
-            Assert.True(dictionary.ContainsKey("#property1"));
-            Assert.True(dictionary.ContainsKey("#property2"));
-            Assert.False(dictionary.ContainsKey("#property3"));
+            Assert.Equal("TestTableName", tableName);
         }
 
         /// <summary>
@@ -82,22 +98,6 @@ namespace Dynamo.ORM.UnitTests.Extensions
         }
 
         /// <summary>
-        /// Populates test data from an extension and then compares the returned key against the populated data
-        /// </summary>
-        [Fact]
-        public void TestGetKey_ExpectKeyDictionary()
-        {
-            var entity = new MockTable();
-
-            entity.PopulateProperties();
-
-            var keyDictionary = entity.GetKey();
-
-            Assert.True(keyDictionary.Count == 1);
-            Assert.Equal(entity.Id, int.Parse(keyDictionary["Id"].N));
-        }
-
-        /// <summary>
         /// Populates test data from an extension and then compares the data against the returned dictionary
         /// Makes sure that key properties aren't returned in the dictionary
         /// </summary>
@@ -117,6 +117,12 @@ namespace Dynamo.ORM.UnitTests.Extensions
         }
     }
 
+    public class MockNoNameTable : Base
+    {
+        [DynamoDBHashKey]
+        public int Id { get; set; }
+    }
+
     [DynamoDBTable("TestTableName")]
     public class MockTable : Base
     {
@@ -130,11 +136,5 @@ namespace Dynamo.ORM.UnitTests.Extensions
         /// To be ignored during reflection
         /// </summary>
         private string Property3 { get; set; }
-    }
-
-    public class MockNoNameTable : Base
-    {
-        [DynamoDBHashKey]
-        public int Id { get; set; }
     }
 }
