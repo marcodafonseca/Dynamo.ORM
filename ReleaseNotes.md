@@ -1,72 +1,76 @@
 # Release Notes
 
-### Version 0.2.0
+## Version 0.2.1
 
-- Added support for IDictionary
+-   Ensured support for v6.0
 
-### Version 0.1.4.6
+## Version 0.2.0
 
-- Changed AWSSDK.DynamoDBv2 version reference to 3.*
+-   Added support for IDictionary
 
-### Version 0.1.4.5
+## Version 0.1.4.6
 
-- Updated dependency version numbers
+-   Changed AWSSDK.DynamoDBv2 version reference to 3.\*
 
-### Version 0.1.4.4
+## Version 0.1.4.5
 
-- Resolved [Does not supporting saving of IEnumerable](https://github.com/marcodafonseca/Dynamo.ORM/issues/4)
+-   Updated dependency version numbers
 
-### Version 0.1.4.3
+## Version 0.1.4.4
 
-- Resolved [Added support for null/empty strings](https://github.com/marcodafonseca/Dynamo.ORM/issues/3)
+-   Resolved [Does not supporting saving of IEnumerable](https://github.com/marcodafonseca/Dynamo.ORM/issues/4)
 
-### Version 0.1.3.0
+## Version 0.1.4.3
 
-- Added transaction support for Add, Update and Delete
+-   Resolved [Added support for null/empty strings](https://github.com/marcodafonseca/Dynamo.ORM/issues/3)
 
-### Version 0.1.2.0
+## Version 0.1.3.0
 
-- Added Guid support
+-   Added transaction support for Add, Update and Delete
 
-### Version 0.1.1.0
+## Version 0.1.2.0
 
-- Added ability to read and write mapped property fields
+-   Added Guid support
 
-### Version 0.1.0.0
+## Version 0.1.1.0
 
-- Resolved [Can't call inline functions in expressions](https://github.com/marcodafonseca/Dynamo.ORM/issues/1)
-- Resolved [Can't query database with particular types](https://github.com/marcodafonseca/Dynamo.ORM/issues/2)
+-   Added ability to read and write mapped property fields
 
-### Version 0.0.4.0
+## Version 0.1.0.0
 
-- Added support for more data types
-  - byte
-  - byte?
-  - byte[]
-  - char
-  - char?
-  - decimal
-  - decimal?
-  - double
-  - double?
-  - float
-  - float?
-  - Int16 (short)
-  - Int16? (short?)
-  - Int64 (long)
-  - Int64? (long?)
-  - UInt16 (ushort)
-  - UInt16? (ushort?)
-  - UInt32 (uint)
-  - UInt32? (uint?)
-  - UInt64 (ulong)
-  - UInt64? (ulong?)
-- Increased support for nullable types
+-   Resolved [Can't call inline functions in expressions](https://github.com/marcodafonseca/Dynamo.ORM/issues/1)
+-   Resolved [Can't query database with particular types](https://github.com/marcodafonseca/Dynamo.ORM/issues/2)
 
-### Version 0.0.3.0
+## Version 0.0.4.0
 
-- Changed Add, Update and Delete functions to be run asynchronously as Tasks
-- Added "null" support for expressions
-- Updated repository tests
-- Updated NuGet packages
-- Added simple benchmarking application (Dynamo.ORM.Benchmarks)
+-   Added support for more data types
+    -   byte
+    -   byte?
+    -   byte[]
+    -   char
+    -   char?
+    -   decimal
+    -   decimal?
+    -   double
+    -   double?
+    -   float
+    -   float?
+    -   Int16 (short)
+    -   Int16? (short?)
+    -   Int64 (long)
+    -   Int64? (long?)
+    -   UInt16 (ushort)
+    -   UInt16? (ushort?)
+    -   UInt32 (uint)
+    -   UInt32? (uint?)
+    -   UInt64 (ulong)
+    -   UInt64? (ulong?)
+-   Increased support for nullable types
+
+## Version 0.0.3.0
+
+-   Changed Add, Update and Delete functions to be run asynchronously as Tasks
+-   Added "null" support for expressions
+-   Updated repository tests
+-   Updated NuGet packages
+-   Added simple benchmarking application (Dynamo.ORM.Benchmarks)
