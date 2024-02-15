@@ -23,11 +23,11 @@ namespace Dynamo.ORM.Services
             this.amazonDynamoDB = amazonDynamoDB;
         }
 
-        public async Task Add<T>(T entity) where T : Base, new()
+        public async Task Add<T>(T entity, string tableName = null) where T : Base, new()
         {
             var request = new PutItemRequest
             {
-                TableName = entity.GetTableName(),
+                TableName = tableName ?? entity.GetTableName(),
                 Item = entity.Map(true)
             };
 
@@ -56,11 +56,11 @@ namespace Dynamo.ORM.Services
             var response = await amazonDynamoDB.TransactWriteItemsAsync(request);
         }
 
-        public async Task Delete<T>(T entity) where T : Base, new()
+        public async Task Delete<T>(T entity, string tableName = null) where T : Base, new()
         {
             var request = new DeleteItemRequest
             {
-                TableName = entity.GetTableName(),
+                TableName = tableName ?? entity.GetTableName(),
                 Key = entity.GetKey()
             };
 
@@ -73,14 +73,14 @@ namespace Dynamo.ORM.Services
                 });
         }
 
-        public async Task Delete<T>(object partitionKey, object sortKey = null) where T : Base, new()
+        public async Task Delete<T>(object partitionKey, object sortKey = null, string tableName = null) where T : Base, new()
         {
             var generic = new T();
             var key = generic.GetKey(partitionKey, sortKey);
 
             var request = new DeleteItemRequest
             {
-                TableName = generic.GetTableName(),
+                TableName = tableName ?? generic.GetTableName(),
                 Key = key
             };
 
@@ -93,7 +93,7 @@ namespace Dynamo.ORM.Services
                 });
         }
 
-        public async Task<T> Get<T>(object partitionKey, object sortKey = null) where T : Base, new()
+        public async Task<T> Get<T>(object partitionKey, object sortKey = null, string tableName = null) where T : Base, new()
         {
             var generic = new T();
             var expressionAttributeNames = generic.GetExpressionAttributes();
@@ -104,7 +104,7 @@ namespace Dynamo.ORM.Services
 
             var request = new GetItemRequest
             {
-                TableName = generic.GetTableName(),
+                TableName = tableName ?? generic.GetTableName(),
                 Key = key,
                 ProjectionExpression = string.Join(", ", expressionAttributeNames.Keys),
                 ExpressionAttributeNames = expressionAttributeNames
@@ -118,11 +118,11 @@ namespace Dynamo.ORM.Services
             return response.Map<T>();
         }
 
-        public async Task<T> Get<T>(Expression<Func<T, bool>> expression) where T : Base, new()
+        public async Task<T> Get<T>(Expression<Func<T, bool>> expression, string tableName = null) where T : Base, new()
         {
             var generic = new T();
 
-            var tableName = generic.GetTableName();
+            tableName = tableName ?? generic.GetTableName();
             var expressionAttributeNames = generic.GetExpressionAttributes();
 
             var dynamoDbRequest = new ScanRequest
@@ -148,11 +148,11 @@ namespace Dynamo.ORM.Services
             return results.SingleOrDefault()?.Map<T>();
         }
 
-        public async Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null) where T : Base, new()
+        public async Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null) where T : Base, new()
         {
             var generic = new T();
 
-            var tableName = generic.GetTableName();
+            tableName = tableName ?? generic.GetTableName();
             var expressionAttributeNames = generic.GetExpressionAttributes();
 
             var dynamoDbRequest = new ScanRequest
@@ -182,11 +182,11 @@ namespace Dynamo.ORM.Services
             writeActions = null;
         }
 
-        public async Task Update<T>(T entity) where T : Base, new()
+        public async Task Update<T>(T entity, string tableName = null) where T : Base, new()
         {
             var request = new UpdateItemRequest
             {
-                TableName = entity.GetTableName(),
+                TableName = tableName ?? entity.GetTableName(),
                 AttributeUpdates = entity
                     .Map()
                     .Select(x => x.MapToAttributeValueUpdate())
