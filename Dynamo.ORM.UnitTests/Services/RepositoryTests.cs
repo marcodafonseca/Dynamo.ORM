@@ -1,8 +1,6 @@
 ﻿using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
 using Dynamo.ORM.Extensions;
 using Dynamo.ORM.Services;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,24 +11,13 @@ namespace Dynamo.ORM.UnitTests.Services
     public class RepositoryTests
     {
         private readonly AmazonDynamoDBClient client;
-
+        const string primaryTableName = "TESTS";
+        const string secondaryTableName = "SECOND_TABLE_TESTS";
         public RepositoryTests()
         {
-            var config = new AmazonDynamoDBConfig
-            {
-                ServiceURL = "http://localhost:8000/"
-            };
-            client = new AmazonDynamoDBClient(config);
-
-            var tables = client.ListTablesAsync().Result;
-
-            if (!tables.TableNames.Contains("TESTS"))
-                client.CreateTableAsync("TESTS", new List<KeySchemaElement> {
-                    new KeySchemaElement("Id", KeyType.HASH)
-                }, new List<AttributeDefinition> {
-                    new AttributeDefinition("Id", ScalarAttributeType.N)
-                }, new ProvisionedThroughput(1, 1))
-                .Wait();
+            client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
+            client.CreateTestTableIfNotExists(primaryTableName).Wait();
+            client.CreateTestTableIfNotExists(secondaryTableName).Wait();
         }
 
         /// <summary>
@@ -63,7 +50,7 @@ namespace Dynamo.ORM.UnitTests.Services
             var repository = new Repository(client);
           
             var value = new TestModel();
-            var runtimeTableName = value.GetTableName();
+            var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
 
             await repository.Add(value, runtimeTableName);
@@ -142,7 +129,7 @@ namespace Dynamo.ORM.UnitTests.Services
             var repository = new Repository(client);
 
             var value = new TestModel();
-            var runtimeTableName = value.GetTableName();
+            var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
 
             // Just added this line so other tests don't interfere with it when running them all together
@@ -191,7 +178,7 @@ namespace Dynamo.ORM.UnitTests.Services
             var repository = new Repository(client);
 
             var value = new TestModel();
-            var runtimeTableName = value.GetTableName();
+            var runtimeTableName = secondaryTableName;
             var dateFilter = new DateTime(2018, 11, 16).ToUniversalTime();
 
             value.PopulateProperties();
@@ -301,7 +288,7 @@ namespace Dynamo.ORM.UnitTests.Services
                 values.Add(value);
             }
 
-            var runtimeTableName = values.First().GetTableName();
+            var runtimeTableName = secondaryTableName;
             foreach (var value in values)
                 await repository.Add(value, runtimeTableName);
 
@@ -356,7 +343,7 @@ namespace Dynamo.ORM.UnitTests.Services
             var repository = new Repository(client);
 
             var value = new TestModel();
-            var runtimeTableName = value.GetTableName();
+            var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
 
             // Just added this line so other tests don't interfere with it when running them all together
