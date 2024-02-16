@@ -11,8 +11,8 @@ namespace Dynamo.ORM.UnitTests.Services
     public class RepositoryTests
     {
         private readonly AmazonDynamoDBClient client;
-        const string primaryTableName = "TESTS";
-        const string secondaryTableName = "SECOND_TABLE_TESTS";
+        private const string primaryTableName = "TESTS";
+        private const string secondaryTableName = "SECOND_TABLE_TESTS";
         public RepositoryTests()
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
