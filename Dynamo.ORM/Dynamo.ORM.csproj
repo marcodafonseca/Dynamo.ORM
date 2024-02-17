@@ -15,8 +15,7 @@
       We are working to make this more robust and feature rich to ensure it will help more developers.
 
       -- Release Notes --
-      - Ensured support for .net v8.0
-      - Upgraded dependencies
+      - Added ability to pass in custom table names to the repository functions at runtime
 
       Full history of release notes can be found on the GitHub page
     </PackageReleaseNotes>
@@ -29,9 +28,15 @@
     <Copyright>Dev200 Pty. LTD</Copyright>
     <PackageIcon>logo.png</PackageIcon>
     <Title>Dynamo.ORM</Title>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
