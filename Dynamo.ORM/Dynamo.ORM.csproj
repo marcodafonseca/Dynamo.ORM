@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.1</TargetFramework>
     <Authors>Dev200</Authors>
     <Company>Dev200</Company>
-    <PackageLicenseUrl>https://github.com/marcodafonseca/Dynamo.ORM/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicense>https://github.com/marcodafonseca/Dynamo.ORM/blob/master/LICENSE</PackageLicense>
     <PackageProjectUrl>https://github.com/marcodafonseca/Dynamo.ORM</PackageProjectUrl>
     <Description>An async ORM built for Amazon Web Service's DynamoDb in .Net Standard</Description>
     <RepositoryType>Git</RepositoryType>
@@ -15,22 +15,27 @@
       We are working to make this more robust and feature rich to ensure it will help more developers.
 
       -- Release Notes --
-      - Ensured support for v6.0
+      - Ensured support for .net v8.0
+      - Upgraded dependencies
 
       Full history of release notes can be found on the GitHub page
     </PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <AssemblyVersion>0.2.1</AssemblyVersion>
     <FileVersion>0.2.1</FileVersion>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <PackageId>Dynamo.ORM</PackageId>
     <Version>0.2.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Dev200 Pty. LTD</Copyright>
-    <PackageIconUrl>https://dev200.co.za/img/logo.png</PackageIconUrl>
+    <PackageIcon>logo.png</PackageIcon>
+    <Title>Dynamo.ORM</Title>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\README.md" Pack="true" PackagePath="\" Link="README.md" />
   </ItemGroup>
 

@@ -62,7 +62,7 @@ namespace Dynamo.ORM.UnitTests.Extensions
                 return;
             }
 
-            Assert.True(false, "Test Class has DynamoDBTable attribute");
+            Assert.Fail("Test Class has DynamoDBTable attribute");
         }
 
         /// <summary>

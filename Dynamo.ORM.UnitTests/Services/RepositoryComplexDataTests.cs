@@ -16,21 +16,8 @@ namespace Dynamo.ORM.UnitTests.Services
 
         public RepositoryComplexDataTests()
         {
-            var config = new AmazonDynamoDBConfig
-            {
-                ServiceURL = "http://localhost:8000/"
-            };
-            client = new AmazonDynamoDBClient(config);
-
-            var tables = client.ListTablesAsync().Result;
-
-            if (!tables.TableNames.Contains("TESTS"))
-                client.CreateTableAsync("TESTS", new List<KeySchemaElement> {
-                    new KeySchemaElement("Id", KeyType.HASH)
-                }, new List<AttributeDefinition> {
-                    new AttributeDefinition("Id", ScalarAttributeType.N)
-                }, new ProvisionedThroughput(1, 1))
-                .Wait();
+            client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
+            client.CreateTestTableIfNotExists("TESTS").Wait();
         }
 
         [Fact]
