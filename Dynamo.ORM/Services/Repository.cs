@@ -27,7 +27,7 @@ namespace Dynamo.ORM.Services
         {
             var request = new PutItemRequest
             {
-                TableName = tableName ?? entity.GetTableName(),
+                TableName = string.IsNullOrWhiteSpace(tableName) ? entity.GetTableName() : tableName,
                 Item = entity.Map(true)
             };
 
@@ -60,7 +60,7 @@ namespace Dynamo.ORM.Services
         {
             var request = new DeleteItemRequest
             {
-                TableName = tableName ?? entity.GetTableName(),
+                TableName = string.IsNullOrWhiteSpace(tableName) ? entity.GetTableName() : tableName,
                 Key = entity.GetKey()
             };
 
@@ -80,7 +80,7 @@ namespace Dynamo.ORM.Services
 
             var request = new DeleteItemRequest
             {
-                TableName = tableName ?? generic.GetTableName(),
+                TableName = string.IsNullOrWhiteSpace(tableName) ? generic.GetTableName() : tableName,
                 Key = key
             };
 
@@ -104,7 +104,7 @@ namespace Dynamo.ORM.Services
 
             var request = new GetItemRequest
             {
-                TableName = tableName ?? generic.GetTableName(),
+                TableName = string.IsNullOrWhiteSpace(tableName) ? generic.GetTableName() : tableName,
                 Key = key,
                 ProjectionExpression = string.Join(", ", expressionAttributeNames.Keys),
                 ExpressionAttributeNames = expressionAttributeNames
@@ -122,7 +122,7 @@ namespace Dynamo.ORM.Services
         {
             var generic = new T();
 
-            tableName = tableName ?? generic.GetTableName();
+            tableName = string.IsNullOrWhiteSpace(tableName) ? generic.GetTableName() : tableName;
             var expressionAttributeNames = generic.GetExpressionAttributes();
 
             var dynamoDbRequest = new ScanRequest
@@ -152,7 +152,7 @@ namespace Dynamo.ORM.Services
         {
             var generic = new T();
 
-            tableName = tableName ?? generic.GetTableName();
+            tableName = string.IsNullOrWhiteSpace(tableName) ? generic.GetTableName() : tableName;
             var expressionAttributeNames = generic.GetExpressionAttributes();
 
             var dynamoDbRequest = new ScanRequest
@@ -186,7 +186,7 @@ namespace Dynamo.ORM.Services
         {
             var request = new UpdateItemRequest
             {
-                TableName = tableName ?? entity.GetTableName(),
+                TableName = string.IsNullOrWhiteSpace(tableName) ? entity.GetTableName() : tableName,
                 AttributeUpdates = entity
                     .Map()
                     .Select(x => x.MapToAttributeValueUpdate())
