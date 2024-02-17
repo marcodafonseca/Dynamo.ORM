@@ -72,7 +72,9 @@ await repository.Update(model);
 ```c#
 await repository.Delete<PersonModel>(1);
 ```
+
 ### If you don't want to use the Table Name attribute you can provide the Table Name as a parameter on repository Call. Examples of calls made with additional parameter
+
 ```c#
 
 var model = new PersonModel();
@@ -81,8 +83,6 @@ model.Id = 1;
 model.FirstName = "John";
 model.LastName = "Smith";
 model.CreatedDate = DateTime.Now;
-
-await repository.Add(model);
 
 await repository.Add(model, "tableName");
 await repository.Get<PersonModel>(model.Id, "tableName");
