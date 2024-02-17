@@ -29,8 +29,6 @@ namespace Dynamo.ORM.UnitTests
                 ServiceURL = "http://localhost:8000/"
             };
             return new AmazonDynamoDBClient(config);// If you don't have environment credentials setup provide dummy variables here.
-
-
         }
     }
 }

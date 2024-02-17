@@ -1,5 +1,4 @@
 ﻿using Amazon.DynamoDBv2;
-using Dynamo.ORM.Extensions;
 using Dynamo.ORM.Services;
 using System;
 using System.Collections.Generic;
@@ -10,9 +9,10 @@ namespace Dynamo.ORM.UnitTests.Services
 {
     public class RepositoryTests
     {
-        private readonly AmazonDynamoDBClient client;
         private const string primaryTableName = "TESTS";
         private const string secondaryTableName = "SECOND_TABLE_TESTS";
+        private readonly AmazonDynamoDBClient client;
+
         public RepositoryTests()
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
@@ -48,7 +48,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public async void TestAddInRunTimeTable_ExpectItemInTable()
         {
             var repository = new Repository(client);
-          
+
             var value = new TestModel();
             var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
@@ -117,7 +117,6 @@ namespace Dynamo.ORM.UnitTests.Services
             Assert.True(entity1.IsEqual(value));
             Assert.Null(entity2);
         }
-
 
         /// <summary>
         /// Test repository's "Delete" function with tablename parameter
@@ -280,7 +279,7 @@ namespace Dynamo.ORM.UnitTests.Services
             for (int i = 10; i < 20; i++)
             {
                 var value = new TestModel();
-               
+
                 value.PopulateProperties();
 
                 value.Id = i;

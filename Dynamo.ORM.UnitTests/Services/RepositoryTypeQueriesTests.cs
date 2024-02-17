@@ -1,7 +1,5 @@
 ﻿using Amazon.DynamoDBv2;
-using Amazon.DynamoDBv2.Model;
 using Dynamo.ORM.Services;
-using System.Collections.Generic;
 using Xunit;
 
 namespace Dynamo.ORM.UnitTests.Services
