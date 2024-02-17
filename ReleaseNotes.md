@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.3.0
+
+-   Added ability to pass in custom table names to the repository functions at runtime
+
 ## Version 0.2.1
 
 -   Ensured support for v6.0
