@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Dynamo.ORM.Services
@@ -23,7 +24,7 @@ namespace Dynamo.ORM.Services
             this.amazonDynamoDB = amazonDynamoDB;
         }
 
-        public async Task Add<T>(T entity, string tableName = null) where T : Base, new()
+        public async Task Add<T>(T entity, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var request = new PutItemRequest
             {
@@ -32,7 +33,7 @@ namespace Dynamo.ORM.Services
             };
 
             if (writeActions == null)
-                await amazonDynamoDB.PutItemAsync(request);
+                await amazonDynamoDB.PutItemAsync(request, cancellationToken: cancellationToken);
             else
                 writeActions.Add(new TransactWriteItem
                 {
@@ -45,7 +46,7 @@ namespace Dynamo.ORM.Services
             writeActions = new List<TransactWriteItem>();
         }
 
-        public async Task CommitWriteTransaction()
+        public async Task CommitWriteTransaction(CancellationToken cancellationToken = default)
         {
             var request = new TransactWriteItemsRequest
             {
@@ -53,10 +54,10 @@ namespace Dynamo.ORM.Services
                 ReturnConsumedCapacity = ReturnConsumedCapacity.TOTAL
             };
 
-            var response = await amazonDynamoDB.TransactWriteItemsAsync(request);
+            var response = await amazonDynamoDB.TransactWriteItemsAsync(request, cancellationToken: cancellationToken);
         }
 
-        public async Task Delete<T>(T entity, string tableName = null) where T : Base, new()
+        public async Task Delete<T>(T entity, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var request = new DeleteItemRequest
             {
@@ -65,7 +66,7 @@ namespace Dynamo.ORM.Services
             };
 
             if (writeActions == null)
-                await amazonDynamoDB.DeleteItemAsync(request);
+                await amazonDynamoDB.DeleteItemAsync(request, cancellationToken: cancellationToken);
             else
                 writeActions.Add(new TransactWriteItem
                 {
@@ -73,7 +74,7 @@ namespace Dynamo.ORM.Services
                 });
         }
 
-        public async Task Delete<T>(object partitionKey, object sortKey = null, string tableName = null) where T : Base, new()
+        public async Task Delete<T>(object partitionKey, object sortKey = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
             var key = generic.GetKey(partitionKey, sortKey);
@@ -85,7 +86,7 @@ namespace Dynamo.ORM.Services
             };
 
             if (writeActions == null)
-                await amazonDynamoDB.DeleteItemAsync(request);
+                await amazonDynamoDB.DeleteItemAsync(request, cancellationToken: cancellationToken);
             else
                 writeActions.Add(new TransactWriteItem
                 {
@@ -93,7 +94,7 @@ namespace Dynamo.ORM.Services
                 });
         }
 
-        public async Task<T> Get<T>(object partitionKey, object sortKey = null, string tableName = null) where T : Base, new()
+        public async Task<T> Get<T>(object partitionKey, object sortKey = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
             var expressionAttributeNames = generic.GetExpressionAttributes();
@@ -110,7 +111,7 @@ namespace Dynamo.ORM.Services
                 ExpressionAttributeNames = expressionAttributeNames
             };
 
-            var response = (await amazonDynamoDB.GetItemAsync(request)).Item;
+            var response = (await amazonDynamoDB.GetItemAsync(request, cancellationToken: cancellationToken)).Item;
 
             if (response.Count == 0)
                 return null;
@@ -118,7 +119,7 @@ namespace Dynamo.ORM.Services
             return response.Map<T>();
         }
 
-        public async Task<T> Get<T>(Expression<Func<T, bool>> expression, string tableName = null) where T : Base, new()
+        public async Task<T> Get<T>(Expression<Func<T, bool>> expression, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
 
@@ -148,7 +149,7 @@ namespace Dynamo.ORM.Services
             return results.SingleOrDefault()?.Map<T>();
         }
 
-        public async Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null) where T : Base, new()
+        public async Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
 
@@ -182,7 +183,7 @@ namespace Dynamo.ORM.Services
             writeActions = null;
         }
 
-        public async Task Update<T>(T entity, string tableName = null) where T : Base, new()
+        public async Task Update<T>(T entity, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var request = new UpdateItemRequest
             {
@@ -195,7 +196,7 @@ namespace Dynamo.ORM.Services
             };
 
             if (writeActions == null)
-                await amazonDynamoDB.UpdateItemAsync(request);
+                await amazonDynamoDB.UpdateItemAsync(request, cancellationToken: cancellationToken);
             else
                 writeActions.Add(new TransactWriteItem
                 {

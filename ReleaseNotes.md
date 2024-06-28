@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.3.1
+
+-   Added CancellationToken for better handling of async calls
+
 ## Version 0.3.0
 
 -   Added ability to pass in custom table names to the repository functions at runtime
