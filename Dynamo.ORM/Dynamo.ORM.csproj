@@ -15,23 +15,28 @@
       We are working to make this more robust and feature rich to ensure it will help more developers.
 
       -- Release Notes --
-      - Ensured support for .net v8.0
-      - Upgraded dependencies
+      - Added CancellationToken for better handling of async calls
 
       Full history of release notes can be found on the GitHub page
     </PackageReleaseNotes>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <AssemblyVersion>0.3.0</AssemblyVersion>
-    <FileVersion>0.3.0</FileVersion>
+    <AssemblyVersion>0.3.1</AssemblyVersion>
+    <FileVersion>0.3.1</FileVersion>
     <PackageId>Dynamo.ORM</PackageId>
-    <Version>0.3.0</Version>
+    <Version>0.3.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Copyright>Dev200 Pty. LTD</Copyright>
     <PackageIcon>logo.png</PackageIcon>
     <Title>Dynamo.ORM</Title>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
     <None Include="..\logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
