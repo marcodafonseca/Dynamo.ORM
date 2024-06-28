@@ -96,9 +96,9 @@ await repository.Delete(model, "tableName");
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.3.0
+### Version 0.3.1
 
--   Added ability to pass in custom table names to the repository functions at runtime
+-   Added CancellationToken for better handling of async calls
 
 ## Important Links
 
