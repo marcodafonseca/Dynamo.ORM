@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.3.3
+
+-   Implemented fix for handling of nullable IDictionary<,>
+
 ## Version 0.3.2
 
 -   Improved handling of `null` properties
