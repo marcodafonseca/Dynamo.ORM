@@ -160,7 +160,9 @@ namespace Dynamo.ORM.Converters
 
             var properties = type.GetProperties();
 
-            if (value.Count > 0 && properties.Length > 0)
+            if (value == null)
+                result = null;
+            else if (value.Count > 0 && properties.Length > 0)
                 foreach (var property in properties)
                 {
                     var propertyType = property.PropertyType;
@@ -196,24 +198,25 @@ namespace Dynamo.ORM.Converters
         {
             var typeArgument = propertyType.GetDeclaringType();
 
-            if (propertyType.IsArray)
-            {
-                var array = propertyType.CreateInstance(values.Count);
+            if (values != null)
+                if (propertyType.IsArray)
+                {
+                    var array = propertyType.CreateInstance(values.Count);
 
-                for (var i = 0; i < values.Count; i++)
-                    array.SetValue(ValueConverters.StringConverter[typeArgument](values[i]), i);
+                    for (var i = 0; i < values.Count; i++)
+                        array.SetValue(ValueConverters.StringConverter[typeArgument](values[i]), i);
 
-                return array;
-            }
-            else if (propertyType.IsGenericType)
-            {
-                var list = (IList)propertyType.CreateInstance();
+                    return array;
+                }
+                else if (propertyType.IsGenericType)
+                {
+                    var list = (IList)propertyType.CreateInstance();
 
-                foreach (var value in values)
-                    list.Add(ValueConverters.StringConverter[typeArgument](value));
+                    foreach (var value in values)
+                        list.Add(ValueConverters.StringConverter[typeArgument](value));
 
-                return list;
-            }
+                    return list;
+                }
 
             return null;
         }

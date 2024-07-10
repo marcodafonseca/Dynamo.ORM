@@ -1,27 +1,28 @@
 ﻿using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.Model;
 using Dynamo.ORM.Models;
 using Dynamo.ORM.Services;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
-using System.Runtime;
-using System;
 
 namespace Dynamo.ORM.UnitTests.Services
 {
-    public class RepositoryComplexDataTests
+    public class RepositoryComplexDataTests : IClassFixture<SharedFixture>
     {
         private readonly AmazonDynamoDBClient client;
+        private readonly SharedFixture sharedFixture;
 
-        public RepositoryComplexDataTests()
+        public RepositoryComplexDataTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
             client.CreateTestTableIfNotExists("TESTS").Wait();
+
+            this.sharedFixture = sharedFixture;
         }
 
         [Fact]
-        public async void TestDictionaryProperty_ExpectPropertyReturned()
+        public async Task TestDictionaryProperty_ExpectPropertyReturned()
         {
             var repository = new Repository(client);
 
@@ -37,7 +38,7 @@ namespace Dynamo.ORM.UnitTests.Services
                     2,
                     3,
                 },
-                Id = 1000
+                Id = sharedFixture.RandomInt()
             };
 
             await repository.Add(model);
@@ -48,7 +49,7 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         [Fact]
-        public async void TestSavingClassProperty_ExpectPropertyReturned()
+        public async Task TestSavingClassProperty_ExpectPropertyReturned()
         {
             var repository = new Repository(client);
 
@@ -56,7 +57,7 @@ namespace Dynamo.ORM.UnitTests.Services
 
             model.PopulateProperties();
 
-            model.Id = 1000;
+            model.Id = sharedFixture.RandomInt();
 
             await repository.Add(model);
 
@@ -66,7 +67,7 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         [Fact]
-        public async void TestUpdatingClassProperty_ExpectPropertyReturned()
+        public async Task TestSavingNullClassProperty_ExpectPropertyReturned()
         {
             var repository = new Repository(client);
 
@@ -74,7 +75,9 @@ namespace Dynamo.ORM.UnitTests.Services
 
             model.PopulateProperties();
 
-            model.Id = 1000;
+            model.Id = sharedFixture.RandomInt();
+
+            model.ChildModel = null;
 
             await repository.Add(model);
 
@@ -82,7 +85,40 @@ namespace Dynamo.ORM.UnitTests.Services
 
             newModel.UpdateProperties();
 
-            newModel.Id = 1000;
+            newModel.ChildModel = null;
+
+            newModel.Id = sharedFixture.RandomInt();
+
+            await repository.Update(newModel);
+
+            var result = await repository.Get<ComplexData>(newModel.Id);
+
+            Assert.True(!model.IsEqual(result));
+            Assert.True(!model.IsEqual(newModel));
+            Assert.True(newModel.IsEqual(result));
+
+            Assert.Equal(model.ChildModel, result.ChildModel);
+            Assert.Equal(newModel.ChildModel, result.ChildModel);
+        }
+
+        [Fact]
+        public async Task TestUpdatingClassProperty_ExpectPropertyReturned()
+        {
+            var repository = new Repository(client);
+
+            var model = new ComplexData();
+
+            model.PopulateProperties();
+
+            model.Id = sharedFixture.RandomInt();
+
+            await repository.Add(model);
+
+            var newModel = await repository.Get<ComplexData>(model.Id);
+
+            newModel.UpdateProperties();
+
+            newModel.Id = sharedFixture.RandomInt();
 
             await repository.Update(newModel);
 
