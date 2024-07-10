@@ -34,7 +34,7 @@ namespace Dynamo.ORM.UnitTests.Services
             {
                 Author = "author" + randomIndex,
                 Body = "body" + randomIndex,
-                Id = Guid.NewGuid().ToString(),
+                Id = randomIndex,
                 Name = "name" + randomIndex,
                 SEO = new SEO
                 {
@@ -67,7 +67,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public DateTime Date { get; set; } = DateTime.UtcNow;
 
         [DynamoDBHashKey]
-        public string Id { get; set; } = string.Empty;
+        public int Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
 
