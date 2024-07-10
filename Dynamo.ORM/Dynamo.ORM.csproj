@@ -15,7 +15,7 @@
       We are working to make this more robust and feature rich to ensure it will help more developers.
 
       -- Release Notes --
-      - Implemented fix for handling of nullable IDictionary<,>
+      - Implemented fix for handling of nullable IDictionary
 
       Full history of release notes can be found on the GitHub page
     </PackageReleaseNotes>
