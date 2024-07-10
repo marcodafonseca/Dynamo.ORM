@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.3.2
+
+-   Improved handling of `null` properties
+
 ## Version 0.3.1
 
 -   Added CancellationToken for better handling of async calls

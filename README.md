@@ -96,9 +96,9 @@ await repository.Delete(model, "tableName");
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.3.1
+### Version 0.3.2
 
--   Added CancellationToken for better handling of async calls
+-   Improved handling of `null` properties
 
 ## Important Links
 
