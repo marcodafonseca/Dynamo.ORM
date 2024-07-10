@@ -1,24 +1,28 @@
 ﻿using Amazon.DynamoDBv2;
 using Dynamo.ORM.Services;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Dynamo.ORM.UnitTests.Services
 {
-    public class RepositoryTypeQueriesTests
+    public class RepositoryTypeQueriesTests : IClassFixture<SharedFixture>
     {
         private readonly AmazonDynamoDBClient client;
+        private readonly SharedFixture sharedFixture;
 
-        public RepositoryTypeQueriesTests()
+        public RepositoryTypeQueriesTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
             client.CreateTestTableIfNotExists("TESTS").Wait();
+
+            this.sharedFixture = sharedFixture;
         }
 
         /// <summary>
         /// Test Repository's "List" function using a boolean property
         /// </summary>
         [Fact]
-        public async void TestBoolQuery_ExpectItemsReturned()
+        public async Task TestBoolQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -42,7 +46,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a byte[] property
         /// </summary>
         [Fact]
-        public async void TestByteArrayQuery_ExpectItemsReturned()
+        public async Task TestByteArrayQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -66,7 +70,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a byte property
         /// </summary>
         [Fact]
-        public async void TestByteQuery_ExpectItemsReturned()
+        public async Task TestByteQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -90,7 +94,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a char property
         /// </summary>
         [Fact]
-        public async void TestCharQuery_ExpectItemsReturned()
+        public async Task TestCharQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -114,7 +118,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using an DateTimeproperty
         /// </summary>
         [Fact]
-        public async void TestDateTimeQuery_ExpectItemsReturned()
+        public async Task TestDateTimeQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -138,7 +142,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a decimal property
         /// </summary>
         [Fact]
-        public async void TestDecimalQuery_ExpectItemsReturned()
+        public async Task TestDecimalQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -162,7 +166,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a double property
         /// </summary>
         [Fact]
-        public async void TestDoubleQuery_ExpectItemsReturned()
+        public async Task TestDoubleQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -186,7 +190,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a float property
         /// </summary>
         [Fact]
-        public async void TestFloatQuery_ExpectItemsReturned()
+        public async Task TestFloatQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -210,7 +214,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using an Integer property
         /// </summary>
         [Fact]
-        public async void TestIntegerQuery_ExpectItemsReturned()
+        public async Task TestIntegerQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -234,7 +238,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a long property
         /// </summary>
         [Fact]
-        public async void TestLongQuery_ExpectItemsReturned()
+        public async Task TestLongQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -258,7 +262,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a bool? property
         /// </summary>
         [Fact]
-        public async void TestNullableBoolQuery_ExpectItemsReturned()
+        public async Task TestNullableBoolQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -282,7 +286,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a byte? property
         /// </summary>
         [Fact]
-        public async void TestNullableByteQuery_ExpectItemsReturned()
+        public async Task TestNullableByteQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -306,7 +310,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a char? property
         /// </summary>
         [Fact]
-        public async void TestNullableCharQuery_ExpectItemsReturned()
+        public async Task TestNullableCharQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -330,7 +334,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a DateTime? property
         /// </summary>
         [Fact]
-        public async void TestNullableDateTimeQuery_ExpectItemsReturned()
+        public async Task TestNullableDateTimeQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -354,7 +358,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a decimal? property
         /// </summary>
         [Fact]
-        public async void TestNullableDecimalQuery_ExpectItemsReturned()
+        public async Task TestNullableDecimalQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -378,7 +382,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a double? property
         /// </summary>
         [Fact]
-        public async void TestNullableDoubleQuery_ExpectItemsReturned()
+        public async Task TestNullableDoubleQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -402,7 +406,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a float? property
         /// </summary>
         [Fact]
-        public async void TestNullableFloatQuery_ExpectItemsReturned()
+        public async Task TestNullableFloatQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -426,7 +430,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a long? property
         /// </summary>
         [Fact]
-        public async void TestNullableLongQuery_ExpectItemsReturned()
+        public async Task TestNullableLongQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -450,7 +454,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a short? property
         /// </summary>
         [Fact]
-        public async void TestNullableShortQuery_ExpectItemsReturned()
+        public async Task TestNullableShortQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -474,7 +478,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a uint? property
         /// </summary>
         [Fact]
-        public async void TestNullableUIntQuery_ExpectItemsReturned()
+        public async Task TestNullableUIntQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -498,7 +502,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a ulong? property
         /// </summary>
         [Fact]
-        public async void TestNullableULongQuery_ExpectItemsReturned()
+        public async Task TestNullableULongQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -522,7 +526,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a ushort? property
         /// </summary>
         [Fact]
-        public async void TestNullableUShortQuery_ExpectItemsReturned()
+        public async Task TestNullableUShortQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -546,7 +550,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test filtering by a nullable field
         /// </summary>
         [Fact]
-        public async void TestQueryOnNullValue_ExpectItemReturned()
+        public async Task TestQueryOnNullValue_ExpectItemReturned()
         {
             var repository = new Repository(client);
 
@@ -570,7 +574,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a short property
         /// </summary>
         [Fact]
-        public async void TestShortQuery_ExpectItemsReturned()
+        public async Task TestShortQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -594,7 +598,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using an String property
         /// </summary>
         [Fact]
-        public async void TestStringQuery_ExpectItemsReturned()
+        public async Task TestStringQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -618,7 +622,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a uint property
         /// </summary>
         [Fact]
-        public async void TestUIntQuery_ExpectItemsReturned()
+        public async Task TestUIntQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -642,7 +646,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a ulong property
         /// </summary>
         [Fact]
-        public async void TestULongQuery_ExpectItemsReturned()
+        public async Task TestULongQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 
@@ -666,7 +670,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test Repository's "List" function using a ushort property
         /// </summary>
         [Fact]
-        public async void TestUShortQuery_ExpectItemsReturned()
+        public async Task TestUShortQuery_ExpectItemsReturned()
         {
             var repository = new Repository(client);
 

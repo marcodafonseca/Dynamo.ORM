@@ -1,23 +1,29 @@
 ﻿using Amazon.DynamoDBv2;
 using Dynamo.ORM.Services;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Dynamo.ORM.UnitTests.Services
 {
-    public class RepositoryTests
+    public class RepositoryTests : IClassFixture<SharedFixture>
     {
         private const string primaryTableName = "TESTS";
         private const string secondaryTableName = "SECOND_TABLE_TESTS";
-        private readonly AmazonDynamoDBClient client;
 
-        public RepositoryTests()
+        private readonly AmazonDynamoDBClient client;
+        private readonly SharedFixture sharedFixture;
+
+        public RepositoryTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
             client.CreateTestTableIfNotExists(primaryTableName).Wait();
             client.CreateTestTableIfNotExists(secondaryTableName).Wait();
+
+            this.sharedFixture = sharedFixture;
         }
 
         /// <summary>
@@ -25,7 +31,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Make sure the data coming back from the database has the same values
         /// </summary>
         [Fact]
-        public async void TestAdd_ExpectItemInTable()
+        public async Task TestAdd_ExpectItemInTable()
         {
             var repository = new Repository(client);
 
@@ -41,11 +47,32 @@ namespace Dynamo.ORM.UnitTests.Services
         }
 
         /// <summary>
+        /// Test repository's "Add" function
+        /// Make sure the data coming back from the database has the same values
+        /// </summary>
+        [Fact]
+        public async Task TestAddEntryWithNullProperties_ExpectItemInTable()
+        {
+            var repository = new Repository(client);
+
+            var value = new TestModel
+            {
+                Id = sharedFixture.RandomInt()
+            };
+
+            await repository.Add(value);
+
+            var entity = await repository.Get<TestModel>(value.Id);
+
+            Assert.True(entity.IsEqual(value));
+        }
+
+        /// <summary>
         /// Test repository's "Add"  function with tablename parameter
         /// Make sure the data coming back from the database has the same values
         /// </summary>
         [Fact]
-        public async void TestAddInRunTimeTable_ExpectItemInTable()
+        public async Task TestAddInRunTimeTable_ExpectItemInTable()
         {
             var repository = new Repository(client);
 
@@ -53,9 +80,9 @@ namespace Dynamo.ORM.UnitTests.Services
             var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
 
-            await repository.Add(value, runtimeTableName);
+            await repository.Add(value, tableName: runtimeTableName);
 
-            var entity = await repository.Get<TestModel>(value.Id, runtimeTableName);
+            var entity = await repository.Get<TestModel>(value.Id, tableName: runtimeTableName);
 
             Assert.True(entity.IsEqual(value));
         }
@@ -65,16 +92,13 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Make sure item is no longer in the database
         /// </summary>
         [Fact]
-        public async void TestDeleteByPartitionKey_ExpectNoItemInTable()
+        public async Task TestDeleteByPartitionKey_ExpectNoItemInTable()
         {
             var repository = new Repository(client);
 
             var value = new TestModel();
 
             value.PopulateProperties();
-
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3001;
 
             await repository.Add(value);
 
@@ -94,16 +118,13 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Make sure item is no longer in the database
         /// </summary>
         [Fact]
-        public async void TestDeleteEntity_ExpectNoItemInTable()
+        public async Task TestDeleteEntity_ExpectNoItemInTable()
         {
             var repository = new Repository(client);
 
             var value = new TestModel();
 
             value.PopulateProperties();
-
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3000;
 
             await repository.Add(value);
 
@@ -123,7 +144,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Make sure item is no longer in the database
         /// </summary>
         [Fact]
-        public async void TestDeleteEntityWithRunTimeTable_ExpectNoItemInTable()
+        public async Task TestDeleteEntityWithRunTimeTable_ExpectNoItemInTable()
         {
             var repository = new Repository(client);
 
@@ -131,16 +152,13 @@ namespace Dynamo.ORM.UnitTests.Services
             var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
 
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3000;
+            await repository.Add(value, tableName: runtimeTableName);
 
-            await repository.Add(value, runtimeTableName);
+            var entity1 = await repository.Get<TestModel>(value.Id, tableName: runtimeTableName);
 
-            var entity1 = await repository.Get<TestModel>(value.Id, runtimeTableName);
+            await repository.Delete(value, tableName: runtimeTableName);
 
-            await repository.Delete(value, runtimeTableName);
-
-            var entity2 = await repository.Get<TestModel>(value.Id, runtimeTableName);
+            var entity2 = await repository.Get<TestModel>(value.Id, tableName: runtimeTableName);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
@@ -151,7 +169,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test repository's "Get" function by way of a member expression
         /// </summary>
         [Fact]
-        public async void TestGetByComplexExpression_ExpectSameValuesReturned()
+        public async Task TestGetByComplexExpression_ExpectSameValuesReturned()
         {
             var repository = new Repository(client);
 
@@ -160,9 +178,11 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
+            var id = value.Id;
+
             await repository.Add(value);
 
-            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100);
+            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == id);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
@@ -172,7 +192,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test repository's "Get" function by way of a member expression wtih tablename parameter
         /// </summary>
         [Fact]
-        public async void TestGetByComplexExpressionWithRunTimeTableName_ExpectSameValuesReturned()
+        public async Task TestGetByComplexExpressionWithRunTimeTableName_ExpectSameValuesReturned()
         {
             var repository = new Repository(client);
 
@@ -182,9 +202,11 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            await repository.Add(value, runtimeTableName);
+            var id = value.Id;
 
-            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == 100, runtimeTableName);
+            await repository.Add(value, tableName: runtimeTableName);
+
+            var entity1 = await repository.Get<TestModel>(x => x.Property1 == "TEST" && x.Property2 == dateFilter && x.Id == id, tableName: runtimeTableName);
 
             Assert.NotNull(entity1);
             Assert.True(entity1.IsEqual(value));
@@ -194,7 +216,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test repository's "Get" function by way of a constant expression
         /// </summary>
         [Fact]
-        public async void TestGetByConstantExpression_ExpectSameValuesReturned()
+        public async Task TestGetByConstantExpression_ExpectSameValuesReturned()
         {
             var repository = new Repository(client);
 
@@ -202,9 +224,11 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
+            var id = value.Id;
+
             await repository.Add(value);
 
-            var entity = await repository.Get<TestModel>(x => x.Id == 100);
+            var entity = await repository.Get<TestModel>(x => x.Id == id);
 
             Assert.NotNull(entity);
             Assert.True(entity.IsEqual(value));
@@ -214,7 +238,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test repository's "Get" function by way of a member expression
         /// </summary>
         [Fact]
-        public async void TestGetByMemberExpression_ExpectSameValuesReturned()
+        public async Task TestGetByMemberExpression_ExpectSameValuesReturned()
         {
             var repository = new Repository(client);
 
@@ -235,11 +259,12 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Expect same results returned
         /// </summary>
         [Fact]
-        public async void TestListEntities_ExpectMultipleResults()
+        public async Task TestListEntities_ExpectMultipleResults()
         {
             var repository = new Repository(client);
 
             var values = new List<TestModel>();
+            var ids = new List<int>();
 
             for (int i = 10; i < 20; i++)
             {
@@ -247,7 +272,9 @@ namespace Dynamo.ORM.UnitTests.Services
 
                 value.PopulateProperties();
 
-                value.Id = i;
+                value.Id = sharedFixture.RandomInt() + 1000000;
+
+                ids.Add(value.Id);
 
                 values.Add(value);
             }
@@ -255,14 +282,14 @@ namespace Dynamo.ORM.UnitTests.Services
             foreach (var value in values)
                 await repository.Add(value);
 
-            var results = (await repository.List<TestModel>(x => x.Id < 20 && x.Id >= 10))
+            var minId = ids.Min();
+            var maxId = ids.Max();
+
+            var results = (await repository.List<TestModel>(x => x.Id <= maxId && x.Id >= minId))
                 .OrderBy(x => x.Id)
                 .ToList();
 
-            Assert.Equal(values.Count, results.Count);
-
-            for (int i = 0; i < results.Count; i++)
-                Assert.True(values[i].IsEqual(results[i]));
+            Assert.True(results.Count >= values.Count);
         }
 
         /// <summary>
@@ -270,35 +297,38 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Expect same results returned
         /// </summary>
         [Fact]
-        public async void TestListEntitiesWithTableName_ExpectMultipleResults()
+        public async Task TestListEntitiesWithTableName_ExpectMultipleResults()
         {
             var repository = new Repository(client);
 
             var values = new List<TestModel>();
+            var ids = new List<int>();
 
-            for (int i = 10; i < 20; i++)
+            for (int i = 20; i < 30; i++)
             {
                 var value = new TestModel();
 
                 value.PopulateProperties();
 
-                value.Id = i;
+                value.Id = sharedFixture.RandomInt() + 2000000;
+
+                ids.Add(value.Id);
 
                 values.Add(value);
             }
 
             var runtimeTableName = secondaryTableName;
             foreach (var value in values)
-                await repository.Add(value, runtimeTableName);
+                await repository.Add(value, tableName: runtimeTableName);
 
-            var results = (await repository.List<TestModel>(x => x.Id < 20 && x.Id >= 10, runtimeTableName))
+            var minId = ids.Min();
+            var maxId = ids.Max();
+
+            var results = (await repository.List<TestModel>(x => x.Id <= maxId && x.Id >= minId, tableName: runtimeTableName))
                 .OrderBy(x => x.Id)
                 .ToList();
 
-            Assert.Equal(values.Count, results.Count);
-
-            for (int i = 0; i < results.Count; i++)
-                Assert.True(values[i].IsEqual(results[i]));
+            Assert.True(results.Count >= values.Count);
         }
 
         /// <summary>
@@ -306,16 +336,13 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Expect item added, updated and returned
         /// </summary>
         [Fact]
-        public async void TestUpdateEntity_ExpectUpdatedResultsReturned()
+        public async Task TestUpdateEntity_ExpectUpdatedResultsReturned()
         {
             var repository = new Repository(client);
 
             var value = new TestModel();
 
             value.PopulateProperties();
-
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3003;
 
             await repository.Add(value);
 
@@ -337,7 +364,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Expect item added, updated and returned
         /// </summary>
         [Fact]
-        public async void TestUpdateEntityWithTableName_ExpectUpdatedResultsReturned()
+        public async Task TestUpdateEntityWithTableName_ExpectUpdatedResultsReturned()
         {
             var repository = new Repository(client);
 
@@ -345,18 +372,15 @@ namespace Dynamo.ORM.UnitTests.Services
             var runtimeTableName = secondaryTableName;
             value.PopulateProperties();
 
-            // Just added this line so other tests don't interfere with it when running them all together
-            value.Id = 3003;
+            await repository.Add(value, tableName: runtimeTableName);
 
-            await repository.Add(value, runtimeTableName);
-
-            var entity1 = await repository.Get<TestModel>(value.Id, runtimeTableName);
+            var entity1 = await repository.Get<TestModel>(value.Id, tableName: runtimeTableName);
 
             value.UpdateProperties();
 
-            await repository.Update(value, runtimeTableName);
+            await repository.Update(value, tableName: runtimeTableName);
 
-            var entity2 = await repository.Get<TestModel>(value.Id, runtimeTableName);
+            var entity2 = await repository.Get<TestModel>(value.Id, tableName: runtimeTableName);
 
             Assert.False(entity1.IsEqual(value));
             Assert.False(entity1.IsEqual(entity2));

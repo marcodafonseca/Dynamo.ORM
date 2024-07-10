@@ -1,25 +1,29 @@
 ﻿using Amazon.DynamoDBv2;
 using Dynamo.ORM.Services;
 using System.Linq;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Dynamo.ORM.UnitTests.Services
 {
-    public class RepositoryInlineFunctionQueryTests
+    public class RepositoryInlineFunctionQueryTests : IClassFixture<SharedFixture>
     {
         private readonly AmazonDynamoDBClient client;
+        private readonly SharedFixture sharedFixture;
 
-        public RepositoryInlineFunctionQueryTests()
+        public RepositoryInlineFunctionQueryTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
             client.CreateTestTableIfNotExists("TESTS").Wait();
+
+            this.sharedFixture = sharedFixture;
         }
 
         /// <summary>
         /// Test filtering with a newly instantiated array while calling the max value
         /// </summary>
         [Fact]
-        public async void TestMaxQueryOnIntParameter_ExpectResults()
+        public async Task TestMaxQueryOnIntParameter_ExpectResults()
         {
             var repository = new Repository(client);
 
@@ -45,7 +49,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test filtering with the toLower function
         /// </summary>
         [Fact]
-        public async void TestToLowerQueryOnStringParameter_ExpectResults()
+        public async Task TestToLowerQueryOnStringParameter_ExpectResults()
         {
             var repository = new Repository(client);
 
@@ -53,7 +57,7 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
-            value.Id = 2000;
+            value.Id = sharedFixture.RandomInt();
             value.Property1 = "test";
 
             await repository.Add(value);
@@ -72,7 +76,7 @@ namespace Dynamo.ORM.UnitTests.Services
         /// Test filtering with the ToUpper function
         /// </summary>
         [Fact]
-        public async void TestToUpperQueryOnStringParameter_ExpectResults()
+        public async Task TestToUpperQueryOnStringParameter_ExpectResults()
         {
             var repository = new Repository(client);
 

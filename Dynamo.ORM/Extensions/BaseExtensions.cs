@@ -215,7 +215,7 @@ namespace Dynamo.ORM.Extensions
                     {
                         var elementType = propertyType.GetDeclaringType();
 
-                        results.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, ((IEnumerable)property.GetValue(entity)).GetEnumerator()));
+                        results.Add(property.Name, ListAttributeValueConverter.ConvertToAttributeValue(elementType, ((IEnumerable)property.GetValue(entity))?.GetEnumerator()));
                     }
                 }
                 else if (propertyType.IsClass)
