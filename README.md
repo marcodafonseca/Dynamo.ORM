@@ -96,9 +96,9 @@ await repository.Delete(model, "tableName");
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.3.2
+### Version 0.3.3
 
--   Improved handling of `null` properties
+-   Implemented fix for handling of nullable IDictionary<,>
 
 ## Important Links
 
