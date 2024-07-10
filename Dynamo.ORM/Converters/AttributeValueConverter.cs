@@ -173,7 +173,7 @@ namespace Dynamo.ORM.Converters
                         {
                             property.SetValue(result, ConvertToValue[propertyType](value[property.Name]));
                         }
-                        else if (propertyType.IsArray || (propertyType.IsGenericType && propertyType.GetInterfaces().Contains(typeof(IEnumerable))))
+                        else if (propertyType.IsArray || (propertyType.IsGenericType && propertyType.GetInterfaces().Contains(typeof(IEnumerable)) && propertyType.GetGenericTypeDefinition() != typeof(IDictionary<,>)))
                         {
                             var typeArgument = propertyType.GetDeclaringType();
 
