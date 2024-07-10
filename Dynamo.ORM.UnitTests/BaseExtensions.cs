@@ -14,7 +14,7 @@ namespace Dynamo.ORM.UnitTests
         private static readonly IDictionary<Type, object> populate = new Dictionary<Type, object>
         {
             { typeof(string), "TEST" },
-            { typeof(int), 100 },
+            { typeof(int), SharedFixture.RandomInt() },
             { typeof(int?), null },
             { typeof(decimal), 100.01m },
             { typeof(decimal?), null },
@@ -104,6 +104,8 @@ namespace Dynamo.ORM.UnitTests
             { typeof(object), TestModel },
             { typeof(IList<object>), new List<object>{ TestModel, TestModel } },
         };
+
+        private static SharedFixture SharedFixture { get => new(); }
 
         private static Services.TestModel TestModel
         {
