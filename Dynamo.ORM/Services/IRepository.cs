@@ -23,7 +23,17 @@ namespace Dynamo.ORM.Services
 
         Task<T> Get<T>(Expression<Func<T, bool>> expression, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new();
 
-        Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new();
+        /// <summary>
+        /// Gets the approximated item count for the table
+        /// https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_TableDescription.html
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="tableName">The table to get item count for</param>
+        /// <param name="cancellationToken"></param>
+        /// <returns>The item count for the table as a long</returns>
+        Task<long> GetTableSize<T>(string tableName = null, CancellationToken cancellationToken = default) where T : Base, new();
+
+        Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, int page = 1, int pageSize = int.MaxValue, CancellationToken cancellationToken = default) where T : Base, new();
 
         void RollbackWriteTransaction();
 

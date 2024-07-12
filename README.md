@@ -96,9 +96,12 @@ await repository.Delete(model, "tableName");
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-### Version 0.3.3
+## Version 0.4.0
 
--   Implemented fix for handling of nullable IDictionary<,>
+-   **! Breaking Changes !** - Changed return type of List function from List to IList
+-   Added pagination parameters to existing List method
+-   Added custom exception for paging, PageNotFoundException
+-   Added method for retrieving approximate item count for a table.
 
 ## Important Links
 
