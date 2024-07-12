@@ -2,7 +2,7 @@
 
 ## Version 0.4.0
 
--   ! Breaking Changes ! - Changed return type of List function from List to IList
+-   **! Breaking Changes !** - Changed return type of List function from List to IList
 -   Added pagination parameters to existing List method
 -   Added custom exception for paging, PageNotFoundException
 -   Added method for retrieving approximate item count for a table.
