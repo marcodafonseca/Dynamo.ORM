@@ -13,7 +13,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public RepositoryTypeQueriesTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
-            client.CreateTestTableIfNotExists("TESTS").Wait();
+            client.CreateTestTableIfNotExists<TestModel>().Wait();
 
             this.sharedFixture = sharedFixture;
         }

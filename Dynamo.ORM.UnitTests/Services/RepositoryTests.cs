@@ -11,8 +11,8 @@ namespace Dynamo.ORM.UnitTests.Services
 {
     public class RepositoryTests : IClassFixture<SharedFixture>
     {
-        private const string primaryTableName = "TESTS";
-        private const string secondaryTableName = "SECOND_TABLE_TESTS";
+        private const string primaryTableName = "PrimaryTestModelTests";
+        private const string secondaryTableName = "SecondaryTestModelTests";
 
         private readonly AmazonDynamoDBClient client;
         private readonly SharedFixture sharedFixture;
@@ -20,8 +20,8 @@ namespace Dynamo.ORM.UnitTests.Services
         public RepositoryTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
-            client.CreateTestTableIfNotExists(primaryTableName).Wait();
-            client.CreateTestTableIfNotExists(secondaryTableName).Wait();
+            client.CreateTestTableIfNotExists<TestModel>(primaryTableName).Wait();
+            client.CreateTestTableIfNotExists<TestModel>(secondaryTableName).Wait();
 
             this.sharedFixture = sharedFixture;
         }
@@ -100,6 +100,8 @@ namespace Dynamo.ORM.UnitTests.Services
 
             value.PopulateProperties();
 
+            value.Id = sharedFixture.RandomInt();
+
             await repository.Add(value);
 
             var entity1 = await repository.Get<TestModel>(value.Id);
@@ -125,6 +127,8 @@ namespace Dynamo.ORM.UnitTests.Services
             var value = new TestModel();
 
             value.PopulateProperties();
+
+            value.Id = sharedFixture.RandomInt();
 
             await repository.Add(value);
 

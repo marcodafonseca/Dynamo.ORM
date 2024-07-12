@@ -16,7 +16,8 @@ namespace Dynamo.ORM.UnitTests.Services
         public RepositoryComplexDataTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
-            client.CreateTestTableIfNotExists("TESTS").Wait();
+            client.CreateTestTableIfNotExists<ComplexData>().Wait();
+            client.CreateTestTableIfNotExists<DictionaryData>().Wait();
 
             this.sharedFixture = sharedFixture;
         }
@@ -135,7 +136,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public TestModel TestModel { get; set; }
     }
 
-    [DynamoDBTable("TESTS")]
+    [DynamoDBTable("ComplexDataTests")]
     internal class ComplexData : Base
     {
         public ComplexChildData ChildModel { get; set; }
@@ -146,7 +147,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public TestModel TestModel { get; set; }
     }
 
-    [DynamoDBTable("TESTS")]
+    [DynamoDBTable("DictionaryDataTests")]
     internal class DictionaryData : Base
     {
         public IDictionary<string, object> Dictionary { get; set; }

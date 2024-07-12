@@ -11,7 +11,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public string Property1 { get; set; }
     }
 
-    [DynamoDBTable("TESTS")]
+    [DynamoDBTable("TestModelTests")]
     internal class TestModel : Base
     {
         private DateTime? property11;

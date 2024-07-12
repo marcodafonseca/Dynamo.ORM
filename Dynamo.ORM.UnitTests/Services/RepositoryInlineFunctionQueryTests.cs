@@ -14,7 +14,7 @@ namespace Dynamo.ORM.UnitTests.Services
         public RepositoryInlineFunctionQueryTests(SharedFixture sharedFixture)
         {
             client = AmazonDynamoDBClientTestExtensions.InitializeTestDynamoDbClient();
-            client.CreateTestTableIfNotExists("TESTS").Wait();
+            client.CreateTestTableIfNotExists<TestModel>().Wait();
 
             this.sharedFixture = sharedFixture;
         }
