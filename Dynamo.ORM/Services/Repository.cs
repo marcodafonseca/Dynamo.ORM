@@ -149,7 +149,18 @@ namespace Dynamo.ORM.Services
             return results.SingleOrDefault()?.Map<T>();
         }
 
-        public async Task<List<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
+        public async Task<long> GetTableSize<T>(string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
+        {
+            var generic = new T();
+
+            tableName = string.IsNullOrWhiteSpace(tableName) ? generic.GetTableName() : tableName;
+
+            var itemCount = (await amazonDynamoDB.DescribeTableAsync(tableName)).Table.ItemCount;
+
+            return itemCount;
+        }
+
+        public async Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, int page = 1, int pageSize = int.MaxValue, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
 
@@ -160,7 +171,8 @@ namespace Dynamo.ORM.Services
             {
                 TableName = tableName,
                 ProjectionExpression = string.Join(", ", expressionAttributeNames.Keys),
-                ExpressionAttributeNames = expressionAttributeNames
+                ExpressionAttributeNames = expressionAttributeNames,
+                Limit = pageSize,
             };
 
             if (expression != null)
@@ -172,7 +184,24 @@ namespace Dynamo.ORM.Services
                 dynamoDbRequest.FilterExpression = expressionString.ToString();
             }
 
-            return (await amazonDynamoDB.ScanAsync(dynamoDbRequest))
+            var paginators = amazonDynamoDB.Paginators.Scan(dynamoDbRequest);
+
+            var pagingEnumerator = paginators.Responses.GetAsyncEnumerator(cancellationToken);
+
+            var currentPageIndex = 0;
+
+            while (currentPageIndex < page)
+            {
+                await pagingEnumerator.MoveNextAsync();
+                currentPageIndex++;
+            }
+
+            if (pagingEnumerator.Current == null)
+            {
+                throw new PageNotFoundException($"Page {page} doesn't exist");
+            }
+
+            return pagingEnumerator.Current
                 .Items
                 .Select(x => x.Map<T>())
                 .ToList();
