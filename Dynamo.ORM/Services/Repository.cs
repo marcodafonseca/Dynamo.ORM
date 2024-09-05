@@ -160,6 +160,7 @@ namespace Dynamo.ORM.Services
             return itemCount;
         }
 
+        [Obsolete("Method is deprecated in favor of overload containing the ListOptions parameter.")]
         public async Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, int page = 1, int pageSize = int.MaxValue, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
@@ -205,6 +206,11 @@ namespace Dynamo.ORM.Services
                 .Items
                 .Select(x => x.Map<T>())
                 .ToList();
+        }
+
+        public async Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, ListOptions listOptions = null, CancellationToken cancellationToken = default) where T : Base, new()
+        {
+            throw new NotImplementedException();
         }
 
         public void RollbackWriteTransaction()
