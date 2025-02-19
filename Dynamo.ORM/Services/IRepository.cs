@@ -33,10 +33,7 @@ namespace Dynamo.ORM.Services
         /// <returns>The item count for the table as a long</returns>
         Task<long> GetTableSize<T>(string tableName = null, CancellationToken cancellationToken = default) where T : Base, new();
 
-        [Obsolete("Method is deprecated in favor of overload containing the ListOptions parameter.")]
         Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, int page = 1, int pageSize = int.MaxValue, CancellationToken cancellationToken = default) where T : Base, new();
-
-        Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, ListOptions listOptions = null, CancellationToken cancellationToken = default) where T : Base, new();
 
         void RollbackWriteTransaction();
 
