@@ -96,12 +96,11 @@ await repository.Delete(model, "tableName");
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-## Version 0.4.0
+## Version 0.5.0
 
-- **! Breaking Changes !** - Changed return type of List function from List to IList
-- Added pagination parameters to existing List method
-- Added custom exception for paging, PageNotFoundException
-- Added method for retrieving approximate item count for a table.
+- Documented the Repository class and interface
+- Upgraded dependencies and fixed code to work with newer dependencies
+- Fixed typo in README
 
 ## Important Links
 
