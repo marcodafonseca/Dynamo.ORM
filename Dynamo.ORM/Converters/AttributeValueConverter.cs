@@ -101,7 +101,7 @@ namespace Dynamo.ORM.Converters
                 return CreateDictionaryObject(value.M);
             else if (!string.IsNullOrWhiteSpace(value.N))
                 return ConvertToValue[typeof(int)](value);
-            else if (value.NS.Count > 0)
+            else if (value.NS?.Count > 0)
             {
                 var list = new List<long>();
 
@@ -127,7 +127,7 @@ namespace Dynamo.ORM.Converters
 
         internal static IList<string> ConvertToArrayValue(Type type, AttributeValue attributeValue)
         {
-            if (attributeValue.NULL)
+            if (attributeValue.NULL == true)
                 return null;
             else if (ListAttributeValueConverter.StringTypes.Contains(type))
                 return attributeValue.SS;
@@ -312,7 +312,7 @@ namespace Dynamo.ORM.Converters
 
         private static object GetNullableValue(AttributeValue attributeValue, Func<object> nonNullFunction)
         {
-            if (!attributeValue.NULL)
+            if (attributeValue.NULL != true)
                 return nonNullFunction();
             return null;
         }

@@ -87,7 +87,7 @@ model.CreatedDate = DateTime.Now;
 await repository.Add(model, "tableName");
 await repository.Get<PersonModel>(model.Id, "tableName");
 await repository.Get<PersonModel>(x => x.FirstName == "Fake", "tableName");
-await repository.List<PersonModel>(x => x.Id < 20 && x.Id >= 10, "tableName")
+await repository.List<PersonModel>(x => x.Id < 20 && x.Id >= 10, "tableName");
 await repository.Update(model, "tableName");
 await repository.Delete(model, "tableName");
 ```
@@ -96,15 +96,14 @@ await repository.Delete(model, "tableName");
 
 Click [here](ReleaseNotes.md) to view all the release notes
 
-## Version 0.4.0
+## Version 0.5.0
 
--   **! Breaking Changes !** - Changed return type of List function from List to IList
--   Added pagination parameters to existing List method
--   Added custom exception for paging, PageNotFoundException
--   Added method for retrieving approximate item count for a table.
+- Documented the Repository class and interface
+- Upgraded dependencies and fixed code to work with newer dependencies
+- Fixed typo in README
 
 ## Important Links
 
--   [Contributing Guidlines](CONTRIBUTING.md)
--   [Code Of Conduct](CODE_OF_CONDUCT.md)
--   [License](LICENSE)
+- [Contributing Guidlines](CONTRIBUTING.md)
+- [Code Of Conduct](CODE_OF_CONDUCT.md)
+- [License](LICENSE)
