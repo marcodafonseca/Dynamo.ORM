@@ -13,17 +13,38 @@ using System.Threading.Tasks;
 
 namespace Dynamo.ORM.Services
 {
+    /// <summary>
+    /// Provides a repository implementation for interacting with Amazon DynamoDB, supporting CRUD operations,
+    /// transactional writes, and query capabilities. This class is designed to work with entities derived from the <see
+    /// cref="Base"/> class.
+    /// </summary>
+    /// <remarks>The <see cref="Repository"/> class facilitates interaction with Amazon DynamoDB by
+    /// abstracting common operations such as adding, updating, deleting, and retrieving items. It also supports
+    /// transactional write operations through the use of DynamoDB's TransactWriteItems API. This class is intended to
+    /// be used with entities that implement the <see cref="Base"/> class, which provides necessary metadata for mapping
+    /// to DynamoDB tables.  The repository supports both single operations and batched transactional operations. To
+    /// perform transactional writes, use <see cref="BeginWriteTransaction"/> to start a transaction, followed by
+    /// multiple write operations (e.g., <see cref="Add{T}"/>, <see cref="Update{T}"/>, <see cref="Delete{T}(T, string,
+    /// CancellationToken)"/>), and then call <see cref="CommitWriteTransaction"/> to commit the transaction.
+    /// Transactions can be rolled back using <see cref="RollbackWriteTransaction"/>.  This class is thread-safe for
+    /// non-transactional operations. However, transactional operations (e.g., <see cref="BeginWriteTransaction"/> and
+    /// subsequent writes) are not thread-safe and should be used in a single-threaded context.</remarks>
     public class Repository : IRepository
     {
         private readonly IAmazonDynamoDB amazonDynamoDB;
 
         private List<TransactWriteItem> writeActions;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Repository"/> class using the specified Amazon DynamoDB client.
+        /// </summary>
+        /// <param name="amazonDynamoDB">The Amazon DynamoDB client used to interact with the DynamoDB service. Cannot be null.</param>
         public Repository(IAmazonDynamoDB amazonDynamoDB)
         {
             this.amazonDynamoDB = amazonDynamoDB;
         }
 
+        /// <inheritdoc />
         public async Task Add<T>(T entity, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var request = new PutItemRequest
@@ -41,13 +62,18 @@ namespace Dynamo.ORM.Services
                 });
         }
 
+        /// <inheritdoc />
         public void BeginWriteTransaction()
         {
             writeActions = new List<TransactWriteItem>();
         }
 
+        /// <inheritdoc />
         public async Task CommitWriteTransaction(CancellationToken cancellationToken = default)
         {
+            if (writeActions == null || writeActions.Count == 0)
+                return;
+
             var request = new TransactWriteItemsRequest
             {
                 TransactItems = writeActions,
@@ -57,6 +83,7 @@ namespace Dynamo.ORM.Services
             var response = await amazonDynamoDB.TransactWriteItemsAsync(request, cancellationToken: cancellationToken);
         }
 
+        /// <inheritdoc />
         public async Task Delete<T>(T entity, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var request = new DeleteItemRequest
@@ -74,6 +101,7 @@ namespace Dynamo.ORM.Services
                 });
         }
 
+        /// <inheritdoc />
         public async Task Delete<T>(object partitionKey, object sortKey = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
@@ -94,6 +122,7 @@ namespace Dynamo.ORM.Services
                 });
         }
 
+        /// <inheritdoc />
         public async Task<T> Get<T>(object partitionKey, object sortKey = null, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
@@ -111,14 +140,18 @@ namespace Dynamo.ORM.Services
                 ExpressionAttributeNames = expressionAttributeNames
             };
 
-            var response = (await amazonDynamoDB.GetItemAsync(request, cancellationToken: cancellationToken)).Item;
+            var response = await amazonDynamoDB.GetItemAsync(request, cancellationToken: cancellationToken);
 
-            if (response.Count == 0)
+            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                throw new RepositoryException($"Could not get item with partitionKey {partitionKey} and sortKey {sortKey}");
+
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK && (response.Item == null || response.Item.Count == 0))
                 return null;
 
-            return response.Map<T>();
+            return response.Item.Map<T>();
         }
 
+        /// <inheritdoc />
         public async Task<T> Get<T>(Expression<Func<T, bool>> expression, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
@@ -149,17 +182,25 @@ namespace Dynamo.ORM.Services
             return results.SingleOrDefault()?.Map<T>();
         }
 
+        /// <inheritdoc />
         public async Task<long> GetTableSize<T>(string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
 
             tableName = string.IsNullOrWhiteSpace(tableName) ? generic.GetTableName() : tableName;
 
-            var itemCount = (await amazonDynamoDB.DescribeTableAsync(tableName)).Table.ItemCount;
+            var response = await amazonDynamoDB.DescribeTableAsync(tableName);
 
-            return itemCount;
+            if (response.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                throw new RepositoryException($"Could not describe table {tableName}");
+
+            if (!response.Table.ItemCount.HasValue)
+                throw new RepositoryException($"Could not get item count for table {tableName}");
+
+            return response.Table.ItemCount.Value;
         }
 
+        /// <inheritdoc />
         public async Task<IList<T>> List<T>(Expression<Func<T, bool>> expression = null, string tableName = null, int page = 1, int pageSize = int.MaxValue, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var generic = new T();
@@ -207,11 +248,13 @@ namespace Dynamo.ORM.Services
                 .ToList();
         }
 
+        /// <inheritdoc />
         public void RollbackWriteTransaction()
         {
             writeActions = null;
         }
 
+        /// <inheritdoc />
         public async Task Update<T>(T entity, string tableName = null, CancellationToken cancellationToken = default) where T : Base, new()
         {
             var request = new UpdateItemRequest
