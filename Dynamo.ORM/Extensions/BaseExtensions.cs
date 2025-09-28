@@ -158,7 +158,7 @@ namespace Dynamo.ORM.Extensions
 
                             property.SetValue(entity, AttributeValueConverter.FromList(propertyType, value));
                         }
-                        else if (declaredType.IsClass && !values[property.Name].NULL)
+                        else if (declaredType.IsClass && values[property.Name].NULL != true)
                         {
                             var value = values[property.Name].L;
 
