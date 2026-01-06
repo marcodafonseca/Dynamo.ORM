@@ -1,5 +1,9 @@
 # Release Notes
 
+## Version 0.5.1
+
+- Ensuring that minimum version of AWSSDK.DynamoDBv2 will be 4.0.10.6
+
 ## Version 0.5.0
 
 - Documented the Repository class and interface
